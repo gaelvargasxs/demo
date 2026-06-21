@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Café Aroma — Menú y pedidos en línea</title>
+    <meta name="description" content="Pide tus cafés, chocolates y postres favoritos de Café Aroma directo a domicilio o recógelos en tienda. Menú en línea con envío por WhatsApp.">
+    <!-- Open Graph (WhatsApp, Facebook, iMessage…) -->
+    <meta property="og:type"        content="website">
+    <meta property="og:title"       content="Café Aroma — Menú y pedidos en línea">
+    <meta property="og:description" content="Pide a domicilio o recoger en tienda. Cafés, chocolates y postres artesanales. ¡Ordena en segundos!">
+    <meta property="og:image"       content="Imagenes/og-preview.jpg"> <!-- ⚠️ Cambia a la ruta de tu imagen de preview (1200×630 px recomendado) -->
+    <meta property="og:url"         content="https://tu-dominio.com/cafeteria.html"> <!-- ⚠️ Cambia a tu URL real -->
+    <meta name="twitter:card"       content="summary_large_image">
+    <link rel="icon" type="image/png" href="Imagenes/favicon.png"> <!-- ⚠️ Cambia a la ruta de tu favicon -->
+    <style>
+        /* Importación de fuentes premium */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-dark: #2C1A14;      
+            --bg-light: #F4EBE1;     
+            --accent-red: #6F4E37;   
+            --text-white: #FFFFFF;   
+            --text-dark: #1A0F0D;    
+            --text-muted: #7A5C53;   
+            --price-wine: #7A1F2B;
+            --icon-red: #C0392B;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #2C1A14; color: var(--text-white); }
+
+        .app-container { width: 100%; max-width: 1200px; margin: 0 auto; position: relative; padding-bottom: 100px; min-height: 100vh; }
+
+        header { position: sticky; top: 0; background-color: rgba(44, 26, 20, 0.95); backdrop-filter: blur(10px); z-index: 10; padding: 20px 20px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 32px; font-style: italic; margin-bottom: 24px; color: var(--text-white); letter-spacing: 1px; text-align: center; }
+        .logo span { color: var(--accent-red); }
+
+        .categories { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; scrollbar-width: none; }
+        .categories::-webkit-scrollbar { display: none; }
+        .category-chip { background-color: rgba(244, 235, 225, 0.08); color: var(--text-white); padding: 10px 20px; border-radius: 30px; font-size: 14px; font-weight: 600; white-space: nowrap; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s; }
+        .category-chip.active { background-color: var(--bg-light); color: var(--text-dark); border-color: var(--bg-light); }
+
+        .menu-section { padding: 24px 20px; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 20px; color: var(--bg-light); }
+        .products-grid { display: grid; grid-template-columns: 1fr; grid-auto-rows: min-content; gap: 16px; align-items: start; }
+
+        .product-card { background-color: var(--bg-light); border-radius: var(--radius-md); padding: 16px; display: flex; align-items: center; gap: 16px; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); align-self: start; height: fit-content; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .product-info { flex: 1; }
+        .product-name { color: var(--text-dark); font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .product-desc { color: var(--text-muted); font-size: 13px; line-height: 1.4; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .product-price { color: var(--price-wine); font-weight: 700; font-size: 16px; }
+
+        .product-image-container { position: relative; width: 96px; height: 96px; flex-shrink: 0; }
+        .product-image-inner { width: 100%; height: 100%; background-color: #E8D9C8; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 48px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); overflow: hidden; }
+        .product-image-inner img { width: 100%; height: 100%; object-fit: cover; display: block; min-width: 0; min-height: 0; font-size: 12px; color: var(--text-muted); }
+        .add-btn { position: absolute; bottom: -12px; right: -12px; background-color: var(--icon-red); color: var(--text-white); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 500; box-shadow: 0 4px 12px rgba(192, 57, 43, 0.5); border: 3px solid var(--bg-light); cursor: pointer; transition: transform 0.1s; z-index: 2; }
+        .add-btn:active { transform: scale(0.9); }
+
+        /* ── Variante vertical (con foto grande), como tarjetas de catálogo ── */
+        .product-card.con-imagen { flex-direction: column; align-items: stretch; padding: 0; overflow: hidden; gap: 0; }
+        .product-card.con-imagen .product-image-container { width: 100%; height: 180px; }
+        .product-card.con-imagen .product-image-inner { border-radius: 0; }
+        .product-card.con-imagen .product-image-container .add-btn { bottom: 14px; right: 14px; border-color: var(--text-white); }
+        .product-card.con-imagen .product-info { padding: 16px; }
+        .product-cat-badge {
+            display: inline-block; background-color: rgba(111,78,55,0.12); color: var(--accent-red);
+            font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+            padding: 4px 12px; border-radius: 20px; margin-bottom: 10px;
+        }
+        /* Variantes de color para el badge según categoría (campo "tag" del producto) */
+        .product-cat-badge.tag-chocolate { background-color: rgba(124, 79, 35, 0.18); color: #7C4F23; }
+        .product-cat-badge.tag-fruta     { background-color: rgba(208, 84, 60, 0.15); color: #D0543C; }
+        .product-cat-badge.tag-cafe      { background-color: rgba(111, 78, 55, 0.18); color: var(--accent-red); }
+        .product-cat-badge.tag-clasico   { background-color: rgba(184, 148, 60, 0.18); color: #B8943C; }
+        .product-card.con-imagen .product-footer { margin-top: 8px; }
+        .product-card.con-imagen .product-price { font-size: 18px; }
+
+        #cart-toggle { display: none; }
+
+        .sticky-cart { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 440px; background-color: var(--accent-red); color: var(--text-white); border-radius: 100px; padding: 16px 24px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(0,0,0,0.4); cursor: pointer; z-index: 20; transition: background-color 0.3s; }
+        .sticky-cart:hover { background-color: #543C29; }
+        .cart-count { background-color: rgba(255, 255, 255, 0.25); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; font-weight: 700; }
+        .cart-label { font-weight: 600; font-size: 16px; }
+        .cart-total { font-weight: 700; font-size: 16px; }
+
+        .checkout-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); opacity: 0; visibility: hidden; transition: all 0.3s ease; z-index: 30; cursor: pointer; }
+        .checkout-modal { position: fixed; bottom: -100%; left: 0; width: 100%; background-color: var(--bg-light); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 32px 24px 40px; z-index: 40; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); color: var(--text-dark); box-shadow: 0 -10px 40px rgba(0,0,0,0.3); display: flex; flex-direction: column; max-height: 90vh; }
+        
+        #cart-toggle:checked ~ .checkout-overlay { opacity: 1; visibility: visible; }
+        #cart-toggle:checked ~ .checkout-modal { bottom: 0; }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .modal-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; }
+        .close-btn { width: 36px; height: 36px; background-color: rgba(0,0,0,0.06); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; color: var(--text-dark); font-size: 14px; }
+
+        .order-items { flex-grow: 1; overflow-y: auto; margin-bottom: 24px; padding-right: 8px; }
+        .order-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+        .item-qty { color: var(--text-dark); font-size: 15px; font-weight: 600; margin-right: 12px; background-color: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 8px; }
+        .item-name { font-weight: 600; font-size: 14px; flex: 1; line-height: 1.2; padding-right: 10px;}
+        .item-price { font-weight: 700; color: var(--text-dark); margin-right: 12px;}
+
+        /* Botones de control de cantidad en carrito */
+        .qty-controls { display: flex; gap: 6px; }
+        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background-color: rgba(0,0,0,0.08); font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-dark); transition: 0.2s; }
+        .qty-btn:active { background-color: rgba(0,0,0,0.15); transform: scale(0.9); }
+
+        .receipt-container { background-color: #EFE6D8; padding: 20px; border-radius: 12px; margin-bottom: 24px; }
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .receipt-total { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 2px dashed rgba(0,0,0,0.15); font-size: 20px; font-weight: 800; color: var(--text-dark); }
+
+        /* Datos del cliente: nombre, entrega, dirección */
+        .field-label { font-size: .78rem; font-weight: 800; color: var(--accent-red); margin-bottom: 8px; letter-spacing: .03em; text-transform: uppercase; }
+        .nombre-campo {
+            width: 100%; border: 1px solid rgba(0,0,0,0.1); outline: none;
+            font-family: 'Plus Jakarta Sans', sans-serif; font-size: .95rem; font-weight: 600;
+            color: var(--text-dark); background: var(--text-white);
+            border-radius: 12px; padding: 12px 14px; margin-bottom: 20px;
+        }
+        .nombre-campo:focus { border-color: var(--accent-red); }
+        .nombre-campo::placeholder { color: var(--text-muted); font-weight: 600; }
+
+        .entrega-opciones { display: flex; gap: 10px; margin-bottom: 16px; }
+        .entrega-btn {
+            flex: 1; background: var(--text-white); border: 2px solid rgba(0,0,0,0.08);
+            border-radius: 14px; padding: 14px 8px; text-align: center; cursor: pointer;
+            transition: all .2s; font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .entrega-btn .e-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+        .entrega-btn .e-titulo { font-weight: 700; font-size: 13px; color: var(--text-dark); display: block; }
+        .entrega-btn .e-nota { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
+        .entrega-btn.active { border-color: var(--accent-red); background-color: #FBF3EA; }
+        .entrega-btn.active .e-titulo { color: var(--accent-red); }
+
+        .direccion-wrapper { display: none; margin-bottom: 8px; }
+        .direccion-wrapper.show { display: block; }
+        .direccion-campo {
+            width: 100%; border: 1px solid rgba(0,0,0,0.1); outline: none; resize: none;
+            font-family: 'Plus Jakarta Sans', sans-serif; font-size: .9rem; font-weight: 500;
+            color: var(--text-dark); background: var(--text-white);
+            border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+        }
+        .direccion-campo:focus { border-color: var(--accent-red); }
+        .btn-ubicacion {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; background: rgba(111,78,55,0.08); color: var(--accent-red);
+            border: 1px dashed var(--accent-red); border-radius: 10px; padding: 10px;
+            font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 20px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .btn-ubicacion:active { background: rgba(111,78,55,0.15); }
+
+        .whatsapp-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background-color: #25D366; color: white; padding: 18px; border-radius: var(--radius-md); font-size: 17px; font-weight: 700; text-decoration: none; box-shadow: 0 8px 20px rgba(37, 211, 102, 0.3); transition: transform 0.2s ease, opacity .2s; cursor: pointer;}
+        .whatsapp-btn:hover { transform: translateY(-2px); background-color: #20BD5A; }
+        .whatsapp-btn.disabled { opacity: .6; pointer-events: none; transform: none; }
+
+        /* ── BOTÓN "MIS PEDIDOS" ── */
+        .mis-pedidos-btn {
+            position: relative; display: flex; align-items: center; gap: 6px;
+            background-color: rgba(244,235,225,0.08); color: var(--text-white);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 30px;
+            padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif; margin: 0 0 14px;
+            align-self: center; transition: background-color .2s;
+        }
+        .mis-pedidos-btn:active { background-color: rgba(244,235,225,0.18); }
+        .mis-pedidos-badge {
+            background-color: var(--icon-red); color: #fff; font-size: 11px; font-weight: 800;
+            border-radius: 20px; min-width: 18px; height: 18px; padding: 0 5px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ── BANNER DE HORARIO ── */
+        .horario-banner {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; font-weight: 700;
+            padding: 10px 16px; margin: 0 20px 6px; border-radius: 12px;
+        }
+        .horario-banner.cerrado { background: rgba(224,84,84,.14); color: #FF8A7A; border: 1px solid rgba(224,84,84,.3); }
+        .horario-banner.abierto { background: rgba(37,200,122,.12); color: #4FE0A0; border: 1px solid rgba(37,200,122,.25); }
+
+        /* ── TOAST "TU PEDIDO ESTÁ LISTO" ── */
+        .toast-listo {
+            position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-120%);
+            background-color: #25C87A; color: #0E2A1C; font-weight: 800; font-size: 14px;
+            padding: 14px 22px; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+            z-index: 100; display: flex; align-items: center; gap: 10px;
+            transition: transform .35s cubic-bezier(.34,1.56,.64,1); max-width: calc(100% - 32px);
+        }
+        .toast-listo.show { transform: translateX(-50%) translateY(0); }
+
+        /* ── MODAL "MIS PEDIDOS" ── */
+        #mis-pedidos-toggle { display: none; }
+        #mis-pedidos-toggle:checked ~ .mp-overlay { opacity: 1; visibility: visible; }
+        #mis-pedidos-toggle:checked ~ .mp-modal { bottom: 0; }
+        .mp-overlay { position: fixed; inset: 0; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); opacity: 0; visibility: hidden; transition: all .3s ease; z-index: 30; cursor: pointer; }
+        .mp-modal {
+            position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh;
+            background-color: var(--bg-light); color: var(--text-dark);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 28px 22px 36px;
+            z-index: 40; transition: all .4s cubic-bezier(.175,.885,.32,1.1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,.3); display: flex; flex-direction: column; overflow: hidden;
+        }
+        .mp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .mp-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+        .mp-list { overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+        .mp-empty { text-align: center; color: var(--text-muted); padding: 30px 10px; font-size: 14px; }
+        .mp-card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+        .mp-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
+        .mp-card-fecha { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .mp-card-items { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px; }
+        .mp-card-total { font-weight: 800; font-size: 14px; }
+        .mp-estado {
+            font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+            padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+        }
+        .mp-estado-pendiente  { background: rgba(232,168,56,.15); color: #B07A1E; }
+        .mp-estado-preparando { background: rgba(79,163,224,.15); color: #2C77AC; }
+        .mp-estado-listo      { background: rgba(37,200,122,.15); color: #1B9760; }
+        .mp-estado-entregado  { background: rgba(136,136,160,.15); color: #6F6F8A; }
+        .mp-estado-cancelado  { background: rgba(224,84,84,.15); color: #C03A3A; }
+        .mp-progreso { display: flex; gap: 4px; margin-top: 10px; }
+        .mp-progreso span { flex: 1; height: 4px; border-radius: 4px; background: rgba(0,0,0,.08); }
+        .mp-progreso span.on { background: var(--accent-red); }
+        .mp-card.es-listo { animation: mpPulso 1.4s ease-in-out infinite; }
+        @keyframes mpPulso { 0%,100% { box-shadow: 0 2px 10px rgba(0,0,0,.06); } 50% { box-shadow: 0 0 0 4px rgba(37,200,122,.35); } }
+
+        @media (min-width: 768px) {
+            .app-container { padding: 0 40px 100px; }
+            header { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; background-color: #2C1A14; border-bottom: none; }
+            .logo { margin-bottom: 0; font-size: 36px; text-align: left; }
+            .mis-pedidos-btn { margin: 0 16px; order: 2; }
+            .categories { padding-bottom: 0; order: 3; }
+            .products-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+            .menu-section { padding: 32px 0; }
+            .section-title { font-size: 28px; margin-bottom: 24px; }
+            .sticky-cart { width: auto; left: auto; right: 40px; transform: none; padding: 16px 32px; gap: 20px; }
+            .checkout-modal { top: 0; bottom: 0; left: auto; right: -450px; width: 450px; height: 100vh; max-height: 100vh; border-radius: 0; padding: 40px 32px; }
+            #cart-toggle:checked ~ .checkout-modal { right: 0; bottom: 0; }
+            .mp-modal { top: 0; bottom: 0; left: auto; right: -450px; width: 450px; height: 100vh; max-height: 100vh; border-radius: 0; padding: 40px 32px; }
+            #mis-pedidos-toggle:checked ~ .mp-modal { right: 0; bottom: 0; }
+            .horario-banner { margin: 0 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="logo">Café <span>Aroma</span></div>
+            <button type="button" id="btn-mis-pedidos" class="mis-pedidos-btn" onclick="abrirMisPedidos()">
+                📦 Mis pedidos<span class="mis-pedidos-badge" id="mis-pedidos-badge" style="display:none;">0</span>
+            </button>
+            <div class="categories" id="categories-container">
+                <div class="category-chip active" data-cat="Todos">Todos</div>
+            </div>
+        </header>
+
+        <div class="horario-banner" id="horario-banner" style="display:none;">
+            <span id="horario-banner-icono">🕒</span>
+            <span id="horario-banner-texto"></span>
+        </div>
+
+        <main class="menu-section" id="menu-container">
+            </main>
+
+        <input type="checkbox" id="cart-toggle" autocomplete="off">
+
+        <label for="cart-toggle" class="sticky-cart" id="sticky-cart">
+            <div class="cart-count" id="cart-count">0</div>
+            <div class="cart-label">Ver carrito</div>
+            <div class="cart-total" id="cart-total-bar">$0.00</div>
+        </label>
+
+        <label for="cart-toggle" class="checkout-overlay"></label> 
+        
+        <div class="checkout-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Tu Pedido</h2>
+                <label for="cart-toggle" class="close-btn">✕</label>
+            </div>
+
+            <div class="order-items" id="order-items-container">
+                 </div>
+
+            <p class="field-label">Tu nombre</p>
+            <input type="text" id="cliente-nombre" class="nombre-campo" placeholder="¿A nombre de quién es el pedido?" maxlength="40">
+
+            <p class="field-label">Entrega</p>
+            <div class="entrega-opciones">
+                <div class="entrega-btn" id="entrega-domicilio" onclick="seleccionarEntrega('domicilio')">
+                    <span class="e-icon">🛵</span>
+                    <span class="e-titulo">A domicilio</span>
+                    <span class="e-nota">+$25.00</span>
+                </div>
+                <div class="entrega-btn" id="entrega-recoger" onclick="seleccionarEntrega('recoger')">
+                    <span class="e-icon">🏬</span>
+                    <span class="e-titulo">Recoger ahí</span>
+                    <span class="e-nota">Sin costo extra</span>
+                </div>
+            </div>
+
+            <div class="direccion-wrapper" id="direccion-wrapper">
+                <textarea id="direccion-campo" class="direccion-campo" rows="2" maxlength="200" placeholder="Calle, número, colonia y alguna referencia"></textarea>
+                <button type="button" class="btn-ubicacion" id="btn-ubicacion" onclick="solicitarUbicacion()">📍 Usar mi ubicación actual</button>
+            </div>
+
+            <div class="receipt-container">
+                <div class="receipt-row">
+                    <span>Subtotal</span>
+                    <span id="receipt-subtotal">$0.00</span>
+                </div>
+                <div class="receipt-row">
+                    <span id="receipt-envio-label">Costo de envío</span>
+                    <span id="receipt-envio">$0.00</span>
+                </div>
+                <div class="receipt-total">
+                    <span>Total</span>
+                    <span id="receipt-total">$0.00</span>
+                </div>
+            </div>
+
+            <a class="whatsapp-btn" id="btn-enviar-pedido" onclick="enviarPedidoWhatsApp();">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                <span id="btn-enviar-pedido-texto">Enviar pedido por WhatsApp</span>
+            </a>
+        </div>
+
+        <!-- ── SEGUIMIENTO / HISTORIAL: "MIS PEDIDOS" ── -->
+        <input type="checkbox" id="mis-pedidos-toggle" autocomplete="off">
+        <label for="mis-pedidos-toggle" class="mp-overlay"></label>
+        <div class="mp-modal">
+            <div class="mp-header">
+                <h2 class="mp-title">Mis pedidos</h2>
+                <label for="mis-pedidos-toggle" class="close-btn">✕</label>
+            </div>
+            <div class="mp-list" id="mp-list">
+                <div class="mp-empty">Aún no has hecho ningún pedido.</div>
+            </div>
+        </div>
+
+        <!-- ── TOAST: PEDIDO LISTO ── -->
+        <div class="toast-listo" id="toast-listo">
+            🎉 <span id="toast-listo-texto">¡Tu pedido ya está listo!</span>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // ⚠️ REEMPLAZA CON TU CONFIGURACIÓN DE FIREBASE (debe ser LA MISMA que en pedidos.html)
+       const firebaseConfig = {
+  apiKey: "AIzaSyD6J9IiySIkqYOPISKtefMd0mGKiQRlu4g",
+  authDomain: "cafe-fresa.firebaseapp.com",
+  projectId: "cafe-fresa",
+  storageBucket: "cafe-fresa.firebasestorage.app",
+  messagingSenderId: "230005643477",
+  appId: "1:230005643477:web:ef80758814e259c8cf6a5c"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.guardarPedidoFirebase = async function(pedido) {
+            try {
+                const ref = await addDoc(collection(db, "pedidos"), {
+                    ...pedido,
+                    timestamp: serverTimestamp(),
+                    estado: "pendiente"
+                });
+                return ref.id;
+            } catch (e) {
+                console.error("Error al guardar pedido en Firebase:", e);
+                return null;
+            }
+        };
+
+        // Escucha en tiempo real los cambios de estado de un pedido (lo usa el seguimiento / historial)
+        window.suscribirPedidoFirebase = function(id, callback) {
+            try {
+                return onSnapshot(doc(db, "pedidos", id), (snap) => {
+                    if (snap.exists()) callback(snap.data());
+                });
+            } catch (e) {
+                console.error("Error al suscribirse al pedido:", e);
+                return null;
+            }
+        };
+    </script>
+
+    <script>
+        // 0. UTILIDAD DE SEGURIDAD — escapa caracteres HTML especiales antes de insertar
+        //    texto de usuario en innerHTML.  Úsala en TODOS los lugares donde datos
+        //    del cliente (nombre, dirección, ítems…) se metan con innerHTML.
+        function esc(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // 1. CONFIGURACIÓN
+        const numeroWhatsApp = "5210000000000"; // ⚠️ PON AQUÍ TU NÚMERO (código de país + número, sin espacios ni +)
+        const costoEnvioFijo = 25.00; // Costo de envío
+
+        // ════════════════════════════════════════
+        // ANTI-SPAM — límite de pedidos por navegador
+        // ════════════════════════════════════════
+        // Máximo de pedidos que se pueden enviar desde el mismo navegador
+        // dentro de la ventana de tiempo definida abajo.
+        const ANTISPAM_MAX_PEDIDOS  = 3;          // pedidos permitidos…
+        const ANTISPAM_VENTANA_MIN  = 60;         // …en esta cantidad de minutos
+
+        // ════════════════════════════════════════
+        // HORARIO DE ATENCIÓN
+        // ════════════════════════════════════════
+        // Pon la hora de apertura y cierre de cada día en formato 24h "HH:MM".
+        // Si un día está cerrado todo el día, deja abre y cierra como null.
+        // 0 = Domingo, 1 = Lunes, 2 = Martes, 3 = Miércoles, 4 = Jueves, 5 = Viernes, 6 = Sábado
+        const HORARIO = {
+            0: { abre: "10:00",    cierra: "20:00"  }, // Domingo cerrado (cambia a horas si abres)
+            1: { abre: "08:00", cierra: "20:00" },
+            2: { abre: "08:00", cierra: "20:00" },
+            3: { abre: "08:00", cierra: "20:00" },
+            4: { abre: "08:00", cierra: "20:00" },
+            5: { abre: "08:00", cierra: "21:00" },
+            6: { abre: "09:00", cierra: "21:00" },
+        };
+
+        function estadoHorario() {
+            const ahora = new Date();
+            const dia = ahora.getDay();
+            const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
+            const hoy = HORARIO[dia];
+
+            if (!hoy || !hoy.abre || !hoy.cierra) {
+                return { abierto: false, mensaje: `Hoy estamos cerrados.${proximaAperturaTexto(dia)}` };
+            }
+
+            const [hA, mA] = hoy.abre.split(':').map(Number);
+            const [hC, mC] = hoy.cierra.split(':').map(Number);
+            const minutosApertura = hA * 60 + mA;
+            const minutosCierre = hC * 60 + mC;
+
+            if (horaActual < minutosApertura) {
+                return { abierto: false, mensaje: `Aún no abrimos. Abrimos hoy a las ${hoy.abre}.` };
+            }
+            if (horaActual >= minutosCierre) {
+                return { abierto: false, mensaje: `Ya cerramos por hoy.${proximaAperturaTexto(dia)}` };
+            }
+            return { abierto: true, mensaje: `Abierto ahora · cerramos a las ${hoy.cierra}` };
+        }
+
+        function proximaAperturaTexto(diaActual) {
+            const nombresDias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+            for (let i = 1; i <= 7; i++) {
+                const siguiente = (diaActual + i) % 7;
+                const horario = HORARIO[siguiente];
+                if (horario && horario.abre) {
+                    const cuando = i === 1 ? 'mañana' : `el ${nombresDias[siguiente]}`;
+                    return ` Abrimos ${cuando} a las ${horario.abre}.`;
+                }
+            }
+            return '';
+        }
+
+        // 2. PRODUCTOS — array estático, se edita directo aquí en el HTML
+        // Cuando tengas el menú real del negocio, solo reemplaza/agrega objetos en este arreglo
+        // siguiendo el mismo formato. Campos:
+        //   id        -> número único
+        //   emoji     -> usado si NO pones "imagen" (tarjeta horizontal clásica)
+        //   imagen    -> ruta a una foto del producto (si la pones, se usa tarjeta con foto grande)
+        //   nombre    -> nombre del producto
+        //   precio    -> número (sin signo de $)
+        //   categoria -> agrupa los productos en secciones del menú (ej: 'cafe', 'chocolate', 'fruta')
+        //   tag       -> clase opcional para colorear el badge de categoría (ver .tag-* en el CSS)
+        //   tagLabel  -> texto que se muestra en el badge (si no se pone, se usa el nombre de la categoría)
+        //   desc      -> descripción corta del producto
+        const productos = [
+            { id: 1, emoji: '☕', nombre: 'Americano', precio: 35, categoria: 'cafe', tag: 'tag-cafe', tagLabel: 'Café', desc: 'Café negro de grano 100% arábica, suave y aromático.' },
+            { id: 2, emoji: '🥛', nombre: 'Latte Vainilla', precio: 48, categoria: 'cafe', tag: 'tag-cafe', tagLabel: 'Café', desc: 'Espresso con leche cremosa y un toque de vainilla natural.' },
+            { id: 3, imagen: 'Imagenes/capuchino.jpeg', nombre: 'Capuchino Clásico', precio: 45, categoria: 'cafe', tag: 'tag-cafe', tagLabel: 'Café', desc: 'Espresso, leche vaporizada y espuma tupida con canela.' },
+            { id: 20, emoji: '🍫', nombre: 'Chocolatísimo Magnum', precio: 100, categoria: 'chocolate', tag: 'tag-chocolate', tagLabel: 'Chocolatísimo', desc: 'Especial Magnum – Explosión de sabor a chocolate. ¡El más pedido!', imagen: 'Imagenes/choco-magnum.jpeg' },
+            { id: 21, emoji: '🍫', nombre: 'Chocolate Caliente', precio: 42, categoria: 'chocolate', tag: 'tag-chocolate', tagLabel: 'Chocolatísimo', desc: 'Chocolate cremoso preparado con leche entera, bien espumoso.' },
+            { id: 30, emoji: '🥐', nombre: 'Croissant de Mantequilla', precio: 32, categoria: 'panaderia', tag: 'tag-clasico', tagLabel: 'Horneado', desc: 'Hojaldrado, recién horneado todas las mañanas.' },
+            { id: 31, imagen: 'Imagenes/pastel-zanahoria.jpeg', nombre: 'Pastel de Zanahoria', precio: 55, categoria: 'panaderia', tag: 'tag-clasico', tagLabel: 'Horneado', desc: 'Rebanada de pastel casero con betún de queso crema.' },
+            { id: 40, emoji: '🍓', nombre: 'Frappé de Fresa', precio: 50, categoria: 'fruta', tag: 'tag-fruta', tagLabel: 'Fresco', desc: 'Fresa natural licuada con hielo y un toque de crema.' },
+            { id: 41, emoji: '🍋', nombre: 'Limonada Mineral', precio: 30, categoria: 'fruta', tag: 'tag-fruta', tagLabel: 'Fresco', desc: 'Limón recién exprimido con agua mineral bien fría.' },
+        ];
+
+        let carrito = JSON.parse(localStorage.getItem('cafe_carrito') || '[]');
+        let categoriaActiva = 'Todos';
+        let tipoEntrega = localStorage.getItem('cafe_entrega') || null; // 'domicilio' | 'recoger'
+
+        // ════════════════════════════════════════
+        // SEGUIMIENTO DE PEDIDOS + HISTORIAL (localStorage)
+        // ════════════════════════════════════════
+        let historialPedidos = JSON.parse(localStorage.getItem('cafe_historial') || '[]');
+        const suscripcionesActivas = {}; // id -> función para cancelar el listener de Firestore
+
+        function guardarHistorial() {
+            localStorage.setItem('cafe_historial', JSON.stringify(historialPedidos));
+        }
+
+        function agregarPedidoAlHistorial(firebaseId, pedido) {
+            historialPedidos.unshift({
+                id: firebaseId,
+                nombre: pedido.nombre,
+                items: pedido.items,
+                total: pedido.total,
+                entrega: pedido.entrega,
+                estado: 'pendiente',
+                fecha: Date.now()
+            });
+            // Conserva como máximo los últimos 20 pedidos en el historial
+            historialPedidos = historialPedidos.slice(0, 20);
+            guardarHistorial();
+            suscribirSeguimiento(firebaseId);
+            renderHistorial();
+        }
+
+        // Escucha cambios de estado en vivo para un pedido del historial
+        function suscribirSeguimiento(id) {
+            if (suscripcionesActivas[id]) return; // ya suscrito
+            if (typeof window.suscribirPedidoFirebase !== 'function') return;
+
+            const unsub = window.suscribirPedidoFirebase(id, (data) => {
+                const pedidoLocal = historialPedidos.find(p => p.id === id);
+                if (!pedidoLocal) return;
+
+                const estadoAnterior = pedidoLocal.estado;
+                const estadoNuevo = data.estado || 'pendiente';
+
+                if (estadoAnterior !== estadoNuevo) {
+                    pedidoLocal.estado = estadoNuevo;
+                    guardarHistorial();
+                    renderHistorial();
+
+                    if (estadoNuevo === 'listo') {
+                        notificarPedidoListo(pedidoLocal.nombre);
+                    }
+                }
+
+                // Cuando el pedido ya terminó su ciclo, dejamos de escuchar
+                if (estadoNuevo === 'entregado' || estadoNuevo === 'cancelado') {
+                    if (suscripcionesActivas[id]) {
+                        suscripcionesActivas[id]();
+                        delete suscripcionesActivas[id];
+                    }
+                }
+            });
+
+            if (unsub) suscripcionesActivas[id] = unsub;
+        }
+
+        // Re-suscribe (al cargar la página) a todos los pedidos que aún siguen activos
+        function resuscribirPedidosActivos() {
+            historialPedidos.forEach(p => {
+                if (p.estado !== 'entregado' && p.estado !== 'cancelado') {
+                    suscribirSeguimiento(p.id);
+                }
+            });
+        }
+
+        function etiquetaEstado(e) {
+            return { pendiente: 'Pendiente', preparando: 'Preparando', listo: '✓ Listo', entregado: 'Entregado', cancelado: 'Cancelado' }[e] || e;
+        }
+
+        function pasoEstado(e) {
+            return { pendiente: 1, preparando: 2, listo: 3, entregado: 3 }[e] || 0;
+        }
+
+        function abrirMisPedidos() {
+            document.getElementById('mis-pedidos-toggle').checked = true;
+            renderHistorial();
+        }
+        window.abrirMisPedidos = abrirMisPedidos;
+
+        function renderHistorial() {
+            const cont = document.getElementById('mp-list');
+
+            if (historialPedidos.length === 0) {
+                cont.innerHTML = '<div class="mp-empty">Aún no has hecho ningún pedido.</div>';
+            } else {
+                cont.innerHTML = historialPedidos.map(p => {
+                    const fecha = new Date(p.fecha).toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                    // esc() en nombres de ítems — vienen de Firestore/localStorage y son datos del cliente
+                    const itemsTexto = (p.items || []).map(it => `${Number(it.cantidad)}x ${esc(it.nombre)}`).join(', ');
+                    const estado = esc(p.estado || 'pendiente'); // solo se usa como clase CSS segura
+                    const paso = pasoEstado(p.estado);
+                    const cancelado = p.estado === 'cancelado';
+                    const barras = cancelado ? '' : `
+                        <div class="mp-progreso">
+                            <span class="${paso >= 1 ? 'on' : ''}"></span>
+                            <span class="${paso >= 2 ? 'on' : ''}"></span>
+                            <span class="${paso >= 3 ? 'on' : ''}"></span>
+                        </div>`;
+                    // p.id es un ID de Firestore (alfanumérico), esc() por consistencia
+                    return `
+                        <div class="mp-card ${p.estado === 'listo' ? 'es-listo' : ''}">
+                            <div class="mp-card-top">
+                                <div>
+                                    <div class="mp-card-fecha">${fecha} · #${esc(p.id).slice(-5).toUpperCase()}</div>
+                                </div>
+                                <span class="mp-estado mp-estado-${estado}">${etiquetaEstado(p.estado)}</span>
+                            </div>
+                            <div class="mp-card-items">${itemsTexto}</div>
+                            <div class="mp-card-total">$${Number(p.total || 0).toFixed(2)}</div>
+                            ${barras}
+                        </div>`;
+                }).join('');
+            }
+
+            // Actualiza la insignia con la cantidad de pedidos activos
+            const activos = historialPedidos.filter(p => p.estado !== 'entregado' && p.estado !== 'cancelado').length;
+            const badge = document.getElementById('mis-pedidos-badge');
+            if (activos > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = activos;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ── Sonido de aviso (sin archivos externos, generado con Web Audio API) ──
+        function reproducirSonidoListo() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                [0, 0.18].forEach((delay, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = i === 0 ? 880 : 1175;
+                    gain.gain.setValueAtTime(0.0001, ctx.currentTime + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + delay + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + 0.3);
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start(ctx.currentTime + delay);
+                    osc.stop(ctx.currentTime + delay + 0.32);
+                });
+            } catch (e) { /* el navegador puede bloquear audio sin interacción previa, no pasa nada */ }
+        }
+
+        function notificarPedidoListo(nombre) {
+            reproducirSonidoListo();
+            const toast = document.getElementById('toast-listo');
+            // textContent es seguro por sí solo (no interpreta HTML), pero
+            // limitamos la longitud por si acaso viene un nombre muy largo.
+            const nombreSeguro = String(nombre || 'Tu pedido').slice(0, 60);
+            document.getElementById('toast-listo-texto').textContent = `¡${nombreSeguro}, ya está listo! ☕`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4500);
+        }
+
+        // 3. RENDERIZAR MENÚ
+        function renderizarMenu() {
+            const contenedor = document.getElementById('menu-container');
+
+            if (productos.length === 0) {
+                contenedor.innerHTML = '<p style="text-align:center; color:#F4EBE1; padding:40px; opacity:.7;">Aún no hay productos cargados.</p>';
+                return;
+            }
+
+            contenedor.innerHTML = '';
+
+            // Extraer las categorías únicas (en el orden en que aparecen)
+            const categorias = [...new Set(productos.map(p => p.categoria))];
+
+            categorias.forEach(cat => {
+                if (categoriaActiva !== 'Todos' && categoriaActiva !== cat) return;
+
+                contenedor.innerHTML += `<h2 class="section-title" style="margin-top: 32px;">${cat}</h2>`;
+                
+                let gridHTML = '<div class="products-grid">';
+                const prodsCat = productos.filter(p => p.categoria === cat);
+                
+                prodsCat.forEach(prod => {
+                    const descripcion = prod.desc || prod.descripcion || '';
+                    const precio = Number(prod.precio) || 0;
+                    const tieneImagen = !!prod.imagen;
+
+                    if (tieneImagen) {
+                        // Tarjeta vertical estilo catálogo (foto arriba, badge de categoría)
+                        gridHTML += `
+                            <div class="product-card con-imagen">
+                                <div class="product-image-container">
+                                    <div class="product-image-inner">
+                                        <img src="${prod.imagen}" alt="${prod.nombre}">
+                                    </div>
+                                    <div class="add-btn" onclick="agregarAlCarrito('${prod.id}')">+</div>
+                                </div>
+                                <div class="product-info">
+                                    <span class="product-cat-badge ${prod.tag || ''}">${prod.tagLabel || cat}</span>
+                                    <h3 class="product-name">${prod.nombre}</h3>
+                                    <p class="product-desc">${descripcion}</p>
+                                    <div class="product-footer">
+                                        <div class="product-price">$${precio.toFixed(2)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Tarjeta horizontal clásica (con emoji)
+                        gridHTML += `
+                            <div class="product-card">
+                                <div class="product-info">
+                                    <h3 class="product-name">${prod.nombre}</h3>
+                                    <p class="product-desc">${descripcion}</p>
+                                    <div class="product-price">$${precio.toFixed(2)}</div>
+                                </div>
+                                <div class="product-image-container">
+                                    <div class="product-image-inner">${prod.emoji || '🍽️'}</div>
+                                    <div class="add-btn" onclick="agregarAlCarrito('${prod.id}')">+</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                gridHTML += '</div>';
+                contenedor.innerHTML += gridHTML;
+            });
+        }
+
+        // 3b. CATEGORÍAS DINÁMICAS (se generan según los productos cargados)
+        function inicializarCategoriasDinamicas() {
+            const cont = document.getElementById('categories-container');
+            const categorias = [...new Set(productos.map(p => p.categoria))];
+
+            // Si la categoría activa ya no existe (se borró), regresa a "Todos"
+            if (categoriaActiva !== 'Todos' && !categorias.includes(categoriaActiva)) {
+                categoriaActiva = 'Todos';
+            }
+
+            let html = `<div class="category-chip${categoriaActiva === 'Todos' ? ' active' : ''}" data-cat="Todos">Todos</div>`;
+            categorias.forEach(cat => {
+                html += `<div class="category-chip${categoriaActiva === cat ? ' active' : ''}" data-cat="${cat}">${cat}</div>`;
+            });
+            cont.innerHTML = html;
+
+            cont.querySelectorAll('.category-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    cont.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    categoriaActiva = chip.dataset.cat;
+                    renderizarMenu();
+                });
+            });
+        }
+
+        // 4. LÓGICA DEL CARRITO
+        function agregarAlCarrito(id) {
+            const producto = productos.find(p => p.id == id);
+            const itemEnCarrito = carrito.find(item => item.id == id);
+            
+            if (itemEnCarrito) {
+                itemEnCarrito.cantidad++;
+            } else {
+                carrito.push({ ...producto, cantidad: 1 });
+            }
+            guardarEstado();
+            actualizarInterfazCarrito();
+        }
+
+        function disminuirCantidad(id) {
+            const itemIndex = carrito.findIndex(item => item.id == id);
+            if (itemIndex > -1) {
+                carrito[itemIndex].cantidad--;
+                if (carrito[itemIndex].cantidad === 0) {
+                    carrito.splice(itemIndex, 1); // Lo elimina si llega a 0
+                }
+            }
+            guardarEstado();
+            actualizarInterfazCarrito();
+        }
+
+        // 4b. PERSISTENCIA (carrito, nombre y entrega sobreviven a un refresh)
+        function guardarEstado() {
+            localStorage.setItem('cafe_carrito', JSON.stringify(carrito));
+            localStorage.setItem('cafe_nombre', document.getElementById('cliente-nombre').value);
+            localStorage.setItem('cafe_direccion', document.getElementById('direccion-campo').value);
+            if (tipoEntrega) localStorage.setItem('cafe_entrega', tipoEntrega);
+        }
+
+        // 4c. SELECCIÓN DE TIPO DE ENTREGA
+        function seleccionarEntrega(tipo) {
+            tipoEntrega = tipo;
+            document.getElementById('entrega-domicilio').classList.toggle('active', tipo === 'domicilio');
+            document.getElementById('entrega-recoger').classList.toggle('active', tipo === 'recoger');
+            document.getElementById('direccion-wrapper').classList.toggle('show', tipo === 'domicilio');
+            guardarEstado();
+            actualizarInterfazCarrito();
+        }
+
+        // 4d. GEOLOCALIZACIÓN (rellena la dirección con coordenadas si el navegador lo permite)
+        function solicitarUbicacion() {
+            if (!navigator.geolocation) {
+                alert('Tu navegador no soporta geolocalización. Escribe tu dirección manualmente.');
+                return;
+            }
+            const boton = document.getElementById('btn-ubicacion');
+            boton.innerText = '📍 Obteniendo ubicación...';
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    const campo = document.getElementById('direccion-campo');
+                    const link = `https://maps.google.com/?q=${latitude},${longitude}`;
+                    campo.value = campo.value ? `${campo.value}\nUbicación: ${link}` : `Ubicación: ${link}`;
+                    boton.innerText = '📍 Usar mi ubicación actual';
+                    guardarEstado();
+                },
+                () => {
+                    alert('No se pudo obtener tu ubicación. Escribe tu dirección manualmente.');
+                    boton.innerText = '📍 Usar mi ubicación actual';
+                }
+            );
+        }
+
+        // 5. ACTUALIZAR INTERFAZ (Textos y sumas)
+        function actualizarInterfazCarrito() {
+            let totalItems = 0;
+            let subtotal = 0;
+            
+            carrito.forEach(item => {
+                totalItems += item.cantidad;
+                subtotal += (item.precio * item.cantidad);
+            });
+
+            const envio = (subtotal > 0 && tipoEntrega === 'domicilio') ? costoEnvioFijo : 0;
+            const total = subtotal + envio;
+
+            // Barra Flotante
+            const stickyCart = document.getElementById('sticky-cart');
+            if (totalItems > 0) {
+                stickyCart.style.display = 'flex';
+                document.getElementById('cart-count').innerText = totalItems;
+                document.getElementById('cart-total-bar').innerText = `$${subtotal.toFixed(2)}`;
+            } else {
+                stickyCart.style.display = 'none';
+                document.getElementById('cart-toggle').checked = false; // Cierra modal automático
+            }
+
+            // Modal: Lista de Productos
+            const orderContainer = document.getElementById('order-items-container');
+            orderContainer.innerHTML = '';
+            
+            carrito.forEach(item => {
+                orderContainer.innerHTML += `
+                    <div class="order-item">
+                        <div style="display:flex; align-items:center;">
+                            <span class="item-qty">${Number(item.cantidad)}x</span>
+                            <span class="item-name">${esc(item.nombre)}</span>
+                        </div>
+                        <div style="display:flex; align-items:center;">
+                            <span class="item-price">$${(item.precio * item.cantidad).toFixed(2)}</span>
+                            <div class="qty-controls">
+                                <button class="qty-btn" onclick="disminuirCantidad('${Number(item.id)}')">-</button>
+                                <button class="qty-btn" onclick="agregarAlCarrito('${Number(item.id)}')">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Modal: Recibo Financiero
+            const envioLabel = document.getElementById('receipt-envio-label');
+            envioLabel.innerText = tipoEntrega === 'recoger' ? 'Costo de envío (recoger en tienda)' : 'Costo de envío';
+            document.getElementById('receipt-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('receipt-envio').innerText = `$${envio.toFixed(2)}`;
+            document.getElementById('receipt-total').innerText = `$${total.toFixed(2)}`;
+        }
+
+        // ════════════════════════════════════════
+        // ANTI-SPAM — helpers
+        // ════════════════════════════════════════
+        function registrarEnvio() {
+            const clave = 'cafe_envios';
+            const ahora = Date.now();
+            const lista = JSON.parse(localStorage.getItem(clave) || '[]');
+            // Agrega el timestamp actual y descarta los que ya vencieron
+            lista.push(ahora);
+            const ventanaMs = ANTISPAM_VENTANA_MIN * 60 * 1000;
+            const activos = lista.filter(t => ahora - t < ventanaMs);
+            localStorage.setItem(clave, JSON.stringify(activos));
+        }
+
+        function verificarAntispam() {
+            const clave = 'cafe_envios';
+            const ahora = Date.now();
+            const ventanaMs = ANTISPAM_VENTANA_MIN * 60 * 1000;
+            const lista = JSON.parse(localStorage.getItem(clave) || '[]');
+            const recientes = lista.filter(t => ahora - t < ventanaMs);
+            if (recientes.length >= ANTISPAM_MAX_PEDIDOS) {
+                // Calcula cuántos minutos faltan para que el más antiguo caduque
+                const masAntiguo = Math.min(...recientes);
+                const minRestantes = Math.ceil((masAntiguo + ventanaMs - ahora) / 60000);
+                alert(
+                    `Has enviado demasiados pedidos en poco tiempo.\n` +
+                    `Por favor espera ${minRestantes} minuto${minRestantes !== 1 ? 's' : ''} antes de intentarlo de nuevo.`
+                );
+                return false; // bloqueado
+            }
+            return true; // permitido
+        }
+
+        // 6. ENVIAR A WHATSAPP + GUARDAR EN FIREBASE
+        let enviandoPedido = false; // evita que un doble clic / doble tap cree el pedido dos veces
+
+        async function enviarPedidoWhatsApp() {
+            if (enviandoPedido) return; // ya se está procesando, ignora el clic extra
+
+            const horario = estadoHorario();
+            if (!horario.abierto) {
+                alert(`Lo sentimos, en este momento estamos cerrados.\n${horario.mensaje}`);
+                return;
+            }
+
+            if (carrito.length === 0) {
+                alert("El carrito está vacío. Agrega productos primero.");
+                return;
+            }
+
+            const nombre = document.getElementById('cliente-nombre').value.trim();
+            if (!nombre) {
+                alert("Por favor escribe tu nombre para identificar el pedido.");
+                document.getElementById('cliente-nombre').focus();
+                return;
+            }
+
+            if (!tipoEntrega) {
+                alert("Elige si tu pedido es a domicilio o para recoger en tienda.");
+                return;
+            }
+
+            const direccion = document.getElementById('direccion-campo').value.trim();
+            if (tipoEntrega === 'domicilio' && !direccion) {
+                alert("Escribe tu dirección para poder entregarte el pedido.");
+                document.getElementById('direccion-campo').focus();
+                return;
+            }
+
+            // Anti-spam: bloquear si se superó el límite de pedidos recientes
+            if (!verificarAntispam()) return;
+
+            enviandoPedido = true;
+            const btn = document.getElementById('btn-enviar-pedido');
+            const btnTexto = document.getElementById('btn-enviar-pedido-texto');
+            btn.classList.add('disabled');
+            btnTexto.textContent = 'Enviando pedido…';
+
+            try {
+
+            let texto = "¡Hola! Quiero hacer un pedido en *Café Aroma* ☕:%0A%0A";
+            texto += `*Nombre:* ${nombre}%0A`;
+            texto += tipoEntrega === 'domicilio'
+                ? `*Entrega:* A domicilio%0A*Dirección:* ${direccion}%0A%0A`
+                : `*Entrega:* Recoger en tienda%0A%0A`;
+            
+            carrito.forEach(item => {
+                texto += `▪ ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toFixed(2)}%0A`;
+            });
+            
+            let subtotal = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+            let envio = tipoEntrega === 'domicilio' ? costoEnvioFijo : 0;
+            let total = subtotal + envio;
+
+            texto += `%0A*Subtotal:* $${subtotal.toFixed(2)}`;
+            texto += `%0A*Envío:* $${envio.toFixed(2)}`;
+            texto += `%0A*Total a pagar:* $${total.toFixed(2)}%0A%0A`;
+            texto += `Por favor confírmenme mi orden. ¡Gracias!`;
+
+            // Guardar en Firebase
+            if (typeof window.guardarPedidoFirebase === 'function') {
+                const pedido = {
+                    nombre,
+                    entrega: tipoEntrega,
+                    direccion: tipoEntrega === 'domicilio' ? direccion : '',
+                    items: carrito.map(i => ({ id: i.id, nombre: i.nombre, cantidad: i.cantidad, precio: i.precio })),
+                    subtotal,
+                    envio,
+                    total
+                };
+                const firebaseId = await window.guardarPedidoFirebase(pedido);
+                if (firebaseId) {
+                    agregarPedidoAlHistorial(firebaseId, pedido);
+                }
+            }
+
+            const url = `https://wa.me/${numeroWhatsApp}?text=${texto}`;
+            window.open(url, '_blank');
+            registrarEnvio(); // anti-spam: cuenta este pedido
+
+            // Vacía el carrito: ya quedó registrado en Firebase y en el historial,
+            // así se evita que el cliente lo reenvíe sin querer.
+            carrito = [];
+            guardarEstado();
+            actualizarInterfazCarrito();
+            document.getElementById('cart-toggle').checked = false;
+
+            } finally {
+                enviandoPedido = false;
+                btn.classList.remove('disabled');
+                btnTexto.textContent = 'Enviar pedido por WhatsApp';
+            }
+        }
+
+        // 7. INICIALIZAR CUANDO CARGUE LA PÁGINA
+        function actualizarBannerHorario() {
+            const horario = estadoHorario();
+            const banner = document.getElementById('horario-banner');
+            const icono = document.getElementById('horario-banner-icono');
+            const texto = document.getElementById('horario-banner-texto');
+
+            banner.style.display = 'flex';
+            banner.classList.toggle('abierto', horario.abierto);
+            banner.classList.toggle('cerrado', !horario.abierto);
+            icono.textContent = horario.abierto ? '🟢' : '🔴';
+            texto.textContent = horario.mensaje;
+        }
+
+        window.onload = () => {
+            inicializarCategoriasDinamicas();
+            renderizarMenu();
+            actualizarBannerHorario();
+            setInterval(actualizarBannerHorario, 60000); // revisa el horario cada minuto
+
+            // Asegura que el modal del carrito SIEMPRE arranque cerrado
+            // (algunos navegadores restauran el checkbox marcado al recargar la página)
+            document.getElementById('cart-toggle').checked = false;
+
+            // Restaurar nombre y dirección guardados
+            document.getElementById('cliente-nombre').value = localStorage.getItem('cafe_nombre') || '';
+            document.getElementById('direccion-campo').value = localStorage.getItem('cafe_direccion') || '';
+
+            // Restaurar tipo de entrega elegido previamente
+            if (tipoEntrega) {
+                seleccionarEntrega(tipoEntrega);
+            }
+
+            // Guardar nombre/dirección automáticamente mientras el usuario escribe
+            document.getElementById('cliente-nombre').addEventListener('input', guardarEstado);
+            document.getElementById('direccion-campo').addEventListener('input', guardarEstado);
+
+            actualizarInterfazCarrito();
+
+            // Pintar historial guardado y reconectar el seguimiento en vivo de pedidos activos
+            renderHistorial();
+            resuscribirPedidosActivos();
+        };
+    </script>
+</body>
+</html>
