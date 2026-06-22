@@ -42,7 +42,7 @@
            SPLASH SCREEN
         ══════════════════════════════════════ */
         #splash {
-            position: fixed; inset: 0; z-index: 9999;
+            position: fixed; inset: 0; height: 100dvh; z-index: 9999;
             background: var(--bg-dark);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center; gap: 20px;
@@ -1543,10 +1543,34 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
         const MIN_SPLASH = 2500; // milisegundos mínimos que se muestra
         const start = Date.now();
 
+        // Fuerza el alto real del splash con el viewport medido por JS.
+        // Algunos navegadores móviles (sobre todo webviews como el de WhatsApp)
+        // calculan mal "inset:0" / "100vh" y dejan un hueco abajo donde ya se
+        // asoma la página. Usamos visualViewport (o innerHeight) y lo
+        // recalculamos en cada resize/orientationchange para que nunca falle.
+        function ajustarAltoSplash() {
+            const alto = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+            splash.style.height = alto + 'px';
+        }
+        ajustarAltoSplash();
+        window.addEventListener('resize', ajustarAltoSplash);
+        window.addEventListener('orientationchange', ajustarAltoSplash);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', ajustarAltoSplash);
+        }
+
         function ocultarSplash() {
             const transcurrido = Date.now() - start;
             const restante = Math.max(0, MIN_SPLASH - transcurrido);
-            setTimeout(() => splash.classList.add('oculto'), restante);
+            setTimeout(() => {
+                splash.classList.add('oculto');
+                // Ya no se necesita seguir escuchando una vez oculto
+                window.removeEventListener('resize', ajustarAltoSplash);
+                window.removeEventListener('orientationchange', ajustarAltoSplash);
+                if (window.visualViewport) {
+                    window.visualViewport.removeEventListener('resize', ajustarAltoSplash);
+                }
+            }, restante);
         }
 
         if (document.fonts && document.fonts.ready) {
