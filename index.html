@@ -39,6 +39,58 @@
         body.modal-open { overflow: hidden; }
 
         /* ══════════════════════════════════════
+           SPLASH SCREEN
+        ══════════════════════════════════════ */
+        #splash {
+            position: fixed; inset: 0; z-index: 9999;
+            background: var(--bg-dark);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 20px;
+            transition: opacity .5s ease, visibility .5s ease;
+        }
+        #splash.oculto { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        .splash-logo {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 52px;
+            color: var(--text-white);
+            letter-spacing: .5px;
+            opacity: 0;
+            transform: translateY(16px);
+            animation: splashFadeUp .6s ease .15s forwards;
+        }
+        .splash-logo span { color: var(--accent-red); }
+
+        .splash-tagline {
+            font-size: 13px; font-weight: 600; letter-spacing: .18em;
+            text-transform: uppercase; color: rgba(255,255,255,.4);
+            opacity: 0;
+            animation: splashFadeUp .6s ease .35s forwards;
+        }
+
+        .splash-dots {
+            display: flex; gap: 8px; margin-top: 12px;
+            opacity: 0;
+            animation: splashFadeUp .5s ease .55s forwards;
+        }
+        .splash-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--accent-red); opacity: .3;
+            animation: splashPulse 1.2s ease-in-out infinite;
+        }
+        .splash-dot:nth-child(2) { animation-delay: .2s; }
+        .splash-dot:nth-child(3) { animation-delay: .4s; }
+
+        @keyframes splashFadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes splashPulse {
+            0%, 100% { opacity: .25; transform: scale(1); }
+            50%       { opacity: 1;   transform: scale(1.3); }
+        }
+
+        /* ══════════════════════════════════════
            NAVBAR
         ══════════════════════════════════════ */
         .navbar {
@@ -459,6 +511,17 @@
     </style>
 </head>
 <body>
+
+<!-- ── SPLASH SCREEN ── -->
+<div id="splash">
+    <div class="splash-logo">Café <span>Aroma</span></div>
+    <div class="splash-tagline">Cada sorbo, una experiencia</div>
+    <div class="splash-dots">
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+    </div>
+</div>
 
 <!-- ══ NAVBAR ══ -->
 <nav class="navbar">
@@ -1473,6 +1536,26 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
             renderHistorial();
             resuscribirPedidosActivos();
         };
-    </script>
+        // ── SPLASH SCREEN ──
+    // Espera a que las fuentes carguen y luego oculta el splash a los 2.5s
+    (function() {
+        const splash = document.getElementById('splash');
+        const MIN_SPLASH = 2500; // milisegundos mínimos que se muestra
+        const start = Date.now();
+
+        function ocultarSplash() {
+            const transcurrido = Date.now() - start;
+            const restante = Math.max(0, MIN_SPLASH - transcurrido);
+            setTimeout(() => splash.classList.add('oculto'), restante);
+        }
+
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(ocultarSplash);
+        } else {
+            ocultarSplash();
+        }
+    })();
+
+</script>
 </body>
 </html>
