@@ -319,9 +319,11 @@
         .receipt-total { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 2px dashed rgba(0,0,0,.15); font-size: 20px; font-weight: 800; color: var(--text-dark); }
 
         .field-label { font-size: .78rem; font-weight: 800; color: var(--accent-red); margin-bottom: 8px; letter-spacing: .03em; text-transform: uppercase; }
-        .nombre-campo { width: 100%; border: 1px solid rgba(0,0,0,.1); outline: none; font-family: 'Plus Jakarta Sans', sans-serif; font-size: .95rem; font-weight: 600; color: var(--text-dark); background: var(--text-white); border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; }
+        .nombre-campo { width: 100%; border: 1px solid rgba(0,0,0,.1); outline: none; font-family: 'Plus Jakarta Sans', sans-serif; font-size: .95rem; font-weight: 600; color: var(--text-dark); background: var(--text-white); border-radius: 12px; padding: 12px 14px; margin-bottom: 4px; transition: border-color .2s; }
         .nombre-campo:focus { border-color: var(--accent-red); }
+        .nombre-campo.campo-invalido { border-color: #E53E3E; background: #FFF5F5; }
         .nombre-campo::placeholder { color: var(--text-muted); font-weight: 600; }
+        .campo-error { font-size: 12px; font-weight: 700; color: #C53030; min-height: 18px; margin-bottom: 8px; padding-left: 4px; }
 
         .entrega-opciones { display: flex; gap: 10px; margin-bottom: 16px; }
         .entrega-btn { flex: 1; background: var(--text-white); border: 2px solid rgba(0,0,0,.08); border-radius: 14px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all .2s; font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -420,6 +422,7 @@
         .mp-estado-en_camino  { background: rgba(167,139,250,.15); color: #7C5BC4; }
         .mp-estado-entregado  { background: rgba(136,136,160,.15); color: #6F6F8A; }
         .mp-estado-cancelado  { background: rgba(224,84,84,.15); color: #C03A3A; }
+        .mp-tiempo-est { font-size: 12px; font-weight: 700; color: #c45700; margin-bottom: 6px; }
         .mp-progreso { display: flex; gap: 4px; margin-top: 10px; }
         .mp-progreso span { flex: 1; height: 4px; border-radius: 4px; background: rgba(0,0,0,.08); }
         .mp-progreso span.on { background: var(--accent-red); }
@@ -757,8 +760,12 @@
     <div class="modal-body">
         <div class="order-items" id="order-items-container"></div>
         <p class="field-label">Tu nombre</p>
-        <input type="text" id="cliente-nombre" class="nombre-campo" placeholder="¿A nombre de quién es el pedido?" maxlength="40">
-        <p class="field-label">Entrega</p>
+        <input type="text" id="cliente-nombre" class="nombre-campo" placeholder="¿A nombre de quién es el pedido?" maxlength="40" autocomplete="name">
+        <div class="campo-error" id="error-nombre"></div>
+        <p class="field-label" style="margin-top:12px">Tu teléfono</p>
+        <input type="tel" id="cliente-telefono" class="nombre-campo" placeholder="10 dígitos" maxlength="10" inputmode="numeric" autocomplete="tel">
+        <div class="campo-error" id="error-telefono"></div>
+        <p class="field-label" style="margin-top:12px">Entrega</p>
         <div class="entrega-opciones">
             <div class="entrega-btn" id="entrega-domicilio" onclick="seleccionarEntrega('domicilio')">
                 <span class="e-icon">🛵</span>
@@ -796,6 +803,7 @@
         <div class="confirm-sub">Revisa que todo esté correcto antes de enviarlo.</div>
         <div class="confirm-resumen">
             <div class="confirm-row"><strong>Nombre</strong><span id="confirm-nombre">—</span></div>
+            <div class="confirm-row"><strong>Teléfono</strong><span id="confirm-telefono">—</span></div>
             <div class="confirm-row"><strong>Entrega</strong><span id="confirm-entrega">—</span></div>
             <div class="confirm-row" id="confirm-direccion-row" style="display:none;"><strong>Dirección</strong><span id="confirm-direccion">—</span></div>
             <div class="confirm-total-row"><span>Total</span><span id="confirm-total">$0.00</span></div>
@@ -1079,17 +1087,24 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
                 const estadoAnterior = pedidoLocal.estado;
                 const estadoNuevo = data.estado || 'pendiente';
 
+                // Actualizar tiempo estimado si lo manda el restaurante
+                if (data.tiempoEstimadoMin) {
+                    pedidoLocal.tiempoEstimadoMin = data.tiempoEstimadoMin;
+                }
+
                 if (estadoAnterior !== estadoNuevo) {
                     pedidoLocal.estado = estadoNuevo;
                     guardarHistorial();
                     renderHistorial();
 
                     if (estadoNuevo === 'preparando') {
-                        mostrarToastCliente('🔥 ¡Tu pedido ya está siendo preparado!');
+                        const mins = data.tiempoEstimadoMin;
+                        const textoTiempo = mins ? ` Estará listo en ~${mins === 25 ? '+25' : mins} min.` : '';
+                        mostrarToastCliente(`🔥 ¡Tu pedido está siendo preparado!${textoTiempo}`);
                     } else if (estadoNuevo === 'listo') {
                         notificarPedidoListo(pedidoLocal.nombre);
                     } else if (estadoNuevo === 'mandadero_asignado') {
-                        mostrarToastCliente('🛵 ¡Mandadero asignado! Pronto saldrá con tu pedido.');
+                        mostrarToastCliente('🛵 ¡Mandadero asignado! Pasará al restaurante a recoger tu pedido.');
                     } else if (estadoNuevo === 'en_camino') {
                         mostrarToastCliente('🛵 ¡Tu pedido ya va en camino hacia ti!');
                     } else if (estadoNuevo === 'entregado') {
@@ -1122,7 +1137,7 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
                 pendiente:          '⏳ Pendiente',
                 preparando:         '🔥 Preparando',
                 listo:              '✅ Listo',
-                mandadero_asignado: '🛵 Mandadero en camino',
+                mandadero_asignado: '🛵 Mandadero asignado',
                 en_camino:          '🛵 En camino',
                 entregado:          '✔ Entregado',
                 cancelado:          '✖ Cancelado'
@@ -1179,6 +1194,9 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
                                 <span class="mp-estado mp-estado-${estado}">${etiquetaEstado(p.estado)}</span>
                             </div>
                             <div class="mp-card-items">${itemsTexto}</div>
+                            ${p.estado === 'preparando' && p.tiempoEstimadoMin
+                                ? `<div class="mp-tiempo-est">⏱️ Listo en ~${p.tiempoEstimadoMin === 25 ? '+25' : p.tiempoEstimadoMin} min</div>`
+                                : ''}
                             <div class="mp-card-total">$${Number(p.total || 0).toFixed(2)}</div>
                             ${barras}
                         </div>`;
@@ -1473,6 +1491,48 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
             return true;
         }
 
+        // ── Helpers de validación de campos ──
+        function mostrarErrorCampo(campo, msg) {
+            const input = document.getElementById('cliente-' + campo);
+            const errDiv = document.getElementById('error-' + campo);
+            if (input) input.classList.add('campo-invalido');
+            if (errDiv) errDiv.textContent = msg;
+        }
+        function limpiarErrorCampo(campo) {
+            const input = document.getElementById('cliente-' + campo);
+            const errDiv = document.getElementById('error-' + campo);
+            if (input) input.classList.remove('campo-invalido');
+            if (errDiv) errDiv.textContent = '';
+        }
+
+        // Validación en tiempo real — nombre: solo letras y espacios
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputNombre = document.getElementById('cliente-nombre');
+            const inputTel    = document.getElementById('cliente-telefono');
+
+            if (inputNombre) {
+                inputNombre.addEventListener('input', () => {
+                    // Elimina caracteres no permitidos al vuelo
+                    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]/g, '');
+                    limpiarErrorCampo('nombre');
+                });
+            }
+
+            if (inputTel) {
+                inputTel.addEventListener('input', () => {
+                    // Solo dígitos, máximo 10
+                    inputTel.value = inputTel.value.replace(/\D/g, '').slice(0, 10);
+                    limpiarErrorCampo('telefono');
+                });
+                // Guardar en localStorage para no tener que reescribir
+                inputTel.addEventListener('change', () => {
+                    if (/^\d{10}$/.test(inputTel.value.trim())) {
+                        localStorage.setItem('cafe_telefono', inputTel.value.trim());
+                    }
+                });
+            }
+        });
+
         // 6. CONFIRMACIÓN FINAL → ENVIAR A WHATSAPP + GUARDAR EN FIREBASE
         let enviandoPedido = false;
 
@@ -1494,8 +1554,25 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
 
             const nombre = document.getElementById('cliente-nombre').value.trim();
             if (!nombre) {
-                showSnack('✏️ Escribe tu nombre para identificar el pedido.', 'error');
+                mostrarErrorCampo('nombre', 'Escribe tu nombre');
                 document.getElementById('cliente-nombre').focus();
+                return;
+            }
+            if (!/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]{2,40}$/.test(nombre)) {
+                mostrarErrorCampo('nombre', 'Solo letras y espacios, mínimo 2 caracteres');
+                document.getElementById('cliente-nombre').focus();
+                return;
+            }
+
+            const telefono = document.getElementById('cliente-telefono').value.trim();
+            if (!telefono) {
+                mostrarErrorCampo('telefono', 'Escribe tu número de teléfono');
+                document.getElementById('cliente-telefono').focus();
+                return;
+            }
+            if (!/^\d{10}$/.test(telefono)) {
+                mostrarErrorCampo('telefono', 'Deben ser exactamente 10 dígitos');
+                document.getElementById('cliente-telefono').focus();
                 return;
             }
 
@@ -1520,6 +1597,7 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
             const total = subtotal + envio;
 
             document.getElementById('confirm-nombre').textContent = nombre;
+            document.getElementById('confirm-telefono').textContent = telefono;
             document.getElementById('confirm-entrega').textContent =
                 tipoEntrega === 'domicilio' ? '🛵 A domicilio' : '🏬 Recoger en tienda';
 
@@ -1558,8 +1636,10 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
 
             try {
 
+            const telefono = document.getElementById('cliente-telefono').value.trim();
             let texto = `¡Hola! Quiero hacer un pedido en *${NOMBRE_NEGOCIO}* ☕:%0A%0A`;
             texto += `*Nombre:* ${nombre}%0A`;
+            texto += `*Teléfono:* ${telefono}%0A`;
             texto += tipoEntrega === 'domicilio'
                 ? `*Entrega:* A domicilio%0A*Dirección:* ${direccion}%0A%0A`
                 : `*Entrega:* Recoger en tienda%0A%0A`;
@@ -1581,9 +1661,10 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
             if (typeof window.guardarPedidoFirebase === 'function') {
                 const pedido = {
                     nombre,
+                    telefono,
                     entrega: tipoEntrega,
                     direccion: tipoEntrega === 'domicilio' ? direccion : '',
-                    restaurante: NOMBRE_NEGOCIO, // lo usa mandaderos.html para "Recoger en: X"
+                    restaurante: NOMBRE_NEGOCIO,
                     items: carrito.map(i => ({ id: i.id, nombre: i.nombre, cantidad: i.cantidad, precio: i.precio })),
                     subtotal,
                     envio,
@@ -1647,8 +1728,9 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
             // (algunos navegadores restauran el checkbox marcado al recargar la página)
             document.getElementById('cart-toggle').checked = false;
 
-            // Restaurar nombre y dirección guardados
+            // Restaurar nombre, teléfono y dirección guardados
             document.getElementById('cliente-nombre').value = localStorage.getItem('cafe_nombre') || '';
+            document.getElementById('cliente-telefono').value = localStorage.getItem('cafe_telefono') || '';
             document.getElementById('direccion-campo').value = localStorage.getItem('cafe_direccion') || '';
 
             // Restaurar tipo de entrega elegido previamente
