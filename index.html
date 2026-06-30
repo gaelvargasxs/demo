@@ -3,556 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Café Aroma — Menú y pedidos en línea</title>
-    <meta name="description" content="Pide tus cafés, chocolates y postres favoritos de Café Aroma directo a domicilio o recógelos en tienda. Menú en línea con envío por WhatsApp.">
-    <!-- Open Graph (WhatsApp, Facebook, iMessage…) -->
-    <meta property="og:type"        content="website">
-    <meta property="og:title"       content="Café Aroma — Menú y pedidos en línea">
-    <meta property="og:description" content="Pide a domicilio o recoger en tienda. Cafés, chocolates y postres artesanales. ¡Ordena en segundos!">
-    <meta property="og:image"       content="Imagenes/og-preview.jpg"> <!-- ⚠️ Cambia a la ruta de tu imagen de preview (1200×630 px recomendado) -->
-    <meta property="og:url"         content="https://tu-dominio.com/cafeteria.html"> <!-- ⚠️ Cambia a tu URL real -->
-    <meta name="twitter:card"       content="summary_large_image">
-    <link rel="icon" type="image/png" href="Imagenes/favicon.png"> <!-- ⚠️ Cambia a la ruta de tu favicon -->
+    <title>NuevoEats — Pide a domicilio</title>
+    <meta name="description" content="Pide comida a domicilio de los mejores restaurantes de tu ciudad.">
+    <link rel="icon" type="image/png" href="Imagenes/favicon.png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
         :root {
-            --bg-dark: #2C1A14;
-            --bg-mid:  #3A2218;
-            --bg-light: #F4EBE1;
-            --bg-cream2: #EFE6D8;
-            --accent-red: #6F4E37;
-            --accent-warm: #C0392B;
-            --text-white: #FFFFFF;
-            --text-dark: #1A0F0D;
-            --text-muted: #7A5C53;
-            --price-wine: #7A1F2B;
-            --icon-red: #C0392B;
-            --radius-lg: 24px;
-            --radius-md: 16px;
+            --bg:       #1A1A2E;
+            --bg2:      #16213E;
+            --bg3:      #0F3460;
+            --surface:  #1E2A45;
+            --card:     #243050;
+            --accent:   #E94560;
+            --accent2:  #F5A623;
+            --green:    #25C87A;
+            --text:     #F0F4FF;
+            --text2:    #A8B4CC;
+            --muted:    #5A6A85;
+            --border:   rgba(255,255,255,.07);
+            --radius:   16px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { scroll-behavior: smooth; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: var(--text-white); }
-        /* Bloquea el scroll del body cuando un modal está abierto (evita el "scroll atrapado" en iOS/Android) */
-        body.modal-open { overflow: hidden; }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html { scroll-behavior:smooth; }
+        body { font-family:'Plus Jakarta Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        body.modal-open { overflow:hidden; }
 
-        /* ══════════════════════════════════════
-           SPLASH SCREEN
-        ══════════════════════════════════════ */
+        /* ══ VISTAS ══ */
+        .vista { display:none; }
+        .vista.activa { display:block; }
+
+        /* ══ SPLASH ══ */
         #splash {
-            position: fixed; inset: 0; height: 100dvh; z-index: 9999;
-            background: var(--bg-dark);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 20px;
-            transition: opacity .5s ease, visibility .5s ease;
+            position:fixed; inset:0; z-index:9999;
+            background:var(--bg);
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+            transition:opacity .5s ease, visibility .5s ease;
         }
-        #splash.oculto { opacity: 0; visibility: hidden; pointer-events: none; }
-
+        #splash.oculto { opacity:0; visibility:hidden; pointer-events:none; }
         .splash-logo {
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-            font-size: 52px;
-            color: var(--text-white);
-            letter-spacing: .5px;
-            opacity: 0;
-            transform: translateY(16px);
-            animation: splashFadeUp .6s ease .15s forwards;
+            font-size:48px; font-weight:800; letter-spacing:-1px; color:var(--text);
+            opacity:0; transform:translateY(16px);
+            animation:fadeUp .6s ease .1s forwards;
         }
-        .splash-logo span { color: var(--accent-red); }
+        .splash-logo span { color:var(--accent); }
+        .splash-sub {
+            font-size:13px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+            color:var(--muted); opacity:0; animation:fadeUp .6s ease .3s forwards;
+        }
+        .splash-dots { display:flex; gap:8px; margin-top:12px; opacity:0; animation:fadeUp .5s ease .5s forwards; }
+        .splash-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:.3; animation:dotPulse 1.2s ease-in-out infinite; }
+        .splash-dot:nth-child(2) { animation-delay:.2s; }
+        .splash-dot:nth-child(3) { animation-delay:.4s; }
+        @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+        @keyframes dotPulse { 0%,100% { opacity:.25; transform:scale(1); } 50% { opacity:1; transform:scale(1.3); } }
 
-        .splash-tagline {
-            font-size: 13px; font-weight: 600; letter-spacing: .18em;
-            text-transform: uppercase; color: rgba(255,255,255,.4);
-            opacity: 0;
-            animation: splashFadeUp .6s ease .35s forwards;
+        /* ══ NAVBAR HOME ══ */
+        .navbar-home {
+            position:sticky; top:0; z-index:100;
+            background:rgba(26,26,46,.96); backdrop-filter:blur(16px);
+            border-bottom:1px solid var(--border);
+            padding:0 20px; height:60px;
+            display:flex; align-items:center; justify-content:space-between;
         }
-
-        .splash-dots {
-            display: flex; gap: 8px; margin-top: 12px;
-            opacity: 0;
-            animation: splashFadeUp .5s ease .55s forwards;
-        }
-        .splash-dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: var(--accent-red); opacity: .3;
-            animation: splashPulse 1.2s ease-in-out infinite;
-        }
-        .splash-dot:nth-child(2) { animation-delay: .2s; }
-        .splash-dot:nth-child(3) { animation-delay: .4s; }
-
-        @keyframes splashFadeUp {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes splashPulse {
-            0%, 100% { opacity: .25; transform: scale(1); }
-            50%       { opacity: 1;   transform: scale(1.3); }
-        }
-
-        /* ══════════════════════════════════════
-           NAVBAR
-        ══════════════════════════════════════ */
-        .navbar {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-            background: rgba(44,26,20,0.96); backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 0 24px; height: 64px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .nav-logo {
-            font-family: 'Playfair Display', serif; font-size: 26px; font-style: italic;
-            color: var(--text-white); letter-spacing: .5px; text-decoration: none;
-        }
-        .nav-logo span { color: var(--accent-red); }
-        .nav-links {
-            display: flex; align-items: center; gap: 32px; list-style: none;
-        }
-        .nav-links a {
-            color: rgba(255,255,255,.65); text-decoration: none; font-size: 14px; font-weight: 600;
-            letter-spacing: .02em; transition: color .2s;
-        }
-        .nav-links a:hover { color: var(--text-white); }
-        .nav-right { display: flex; align-items: center; gap: 12px; }
+        .brand { font-size:22px; font-weight:800; letter-spacing:-.5px; }
+        .brand span { color:var(--accent); }
         .nav-pedidos-btn {
-            display: flex; align-items: center; gap: 6px;
-            background: rgba(244,235,225,0.08); border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 30px; padding: 8px 16px; font-size: 13px; font-weight: 700;
-            color: var(--text-white); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
-            transition: background .2s;
+            position:relative; background:none; border:none;
+            color:var(--text2); font-size:22px; cursor:pointer; padding:4px;
         }
-        .nav-pedidos-btn:hover { background: rgba(244,235,225,0.15); }
-        .mis-pedidos-badge {
-            background: var(--icon-red); color: #fff; font-size: 11px; font-weight: 800;
-            border-radius: 20px; min-width: 18px; height: 18px; padding: 0 5px;
-            display: flex; align-items: center; justify-content: center;
+        .nav-badge {
+            position:absolute; top:-2px; right:-4px;
+            background:var(--accent); color:#fff;
+            font-size:10px; font-weight:800; min-width:18px; height:18px;
+            border-radius:9px; display:none; align-items:center; justify-content:center; padding:0 4px;
         }
 
-        /* Hamburguesa */
-        .hamburger {
-            display: none; flex-direction: column; justify-content: center; gap: 5px;
-            width: 40px; height: 40px; cursor: pointer; border: none; background: none; padding: 6px;
+        /* ══ HOME: HERO ══ */
+        .home-hero {
+            background:linear-gradient(135deg, var(--bg3) 0%, var(--bg2) 60%, var(--bg) 100%);
+            padding:36px 20px 28px;
+            position:relative; overflow:hidden;
         }
-        .hamburger span {
-            display: block; height: 2px; border-radius: 2px;
-            background: var(--text-white); transition: all .3s;
+        .home-hero::after {
+            content:'🍔🍕🥗🌮'; position:absolute; right:-10px; top:50%;
+            transform:translateY(-50%); font-size:60px; opacity:.08; letter-spacing:-8px;
+            line-height:1; pointer-events:none;
         }
-        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-        .hamburger.open span:nth-child(2) { opacity: 0; }
-        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        .hero-eyebrow { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+        .hero-title { font-size:28px; font-weight:800; line-height:1.15; margin-bottom:8px; }
+        .hero-title span { color:var(--accent2); }
+        .hero-sub { font-size:14px; color:var(--text2); font-weight:500; line-height:1.5; }
 
-        /* Menú mobile */
-        .mobile-menu {
-            display: none; position: fixed; top: 64px; left: 0; right: 0; bottom: 0;
-            background: var(--bg-dark); z-index: 99; flex-direction: column;
-            padding: 32px 28px; gap: 6px;
+        /* ══ BÚSQUEDA ══ */
+        .search-wrap { padding:16px 20px 8px; }
+        .search-box {
+            width:100%; background:var(--surface); border:1px solid var(--border);
+            border-radius:12px; padding:12px 16px 12px 42px;
+            font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:500;
+            color:var(--text); outline:none; transition:border-color .2s;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235A6A85' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E");
+            background-repeat:no-repeat; background-position:14px center;
         }
-        .mobile-menu.open { display: flex; }
-        .mobile-menu a {
-            color: var(--text-white); text-decoration: none; font-size: 22px; font-weight: 700;
-            padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.06);
-            font-family: 'Playfair Display', serif; font-style: italic;
-        }
-        .mobile-menu .mobile-pedidos-btn {
-            margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 8px;
-            background: rgba(244,235,225,.08); border: 1px solid rgba(255,255,255,.12);
-            border-radius: 14px; padding: 16px; font-size: 15px; font-weight: 700;
-            color: var(--text-white); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        .search-box::placeholder { color:var(--muted); }
+        .search-box:focus { border-color:var(--accent); }
 
-        /* ══════════════════════════════════════
-           HERO
-        ══════════════════════════════════════ */
-        #inicio {
-            min-height: 100vh; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; text-align: center;
-            padding: 100px 24px 60px; position: relative; overflow: hidden;
-        }
-        .hero-bg {
-            position: absolute; inset: 0; z-index: 0;
-            background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(111,78,55,0.28) 0%, transparent 70%),
-                        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(192,57,43,0.10) 0%, transparent 60%);
-        }
-        .hero-eyebrow {
-            font-size: 11px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase;
-            color: var(--accent-red); margin-bottom: 20px; position: relative; z-index: 1;
-        }
-        .hero-title {
-            font-family: 'Playfair Display', serif; font-size: clamp(42px, 8vw, 80px);
-            font-style: italic; line-height: 1.08; color: var(--text-white);
-            margin-bottom: 22px; position: relative; z-index: 1;
-        }
-        .hero-title span { color: var(--accent-red); }
-        .hero-sub {
-            font-size: clamp(15px, 2.5vw, 18px); color: rgba(255,255,255,.6); max-width: 480px;
-            line-height: 1.6; margin-bottom: 40px; position: relative; z-index: 1; font-weight: 500;
-        }
-        .hero-ctas { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 1; }
-        .cta-primary {
-            background: var(--accent-red); color: var(--text-white); border: none;
-            border-radius: 50px; padding: 16px 32px; font-size: 15px; font-weight: 800;
-            cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
-            text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-            box-shadow: 0 8px 24px rgba(111,78,55,0.4); transition: transform .2s, box-shadow .2s;
-        }
-        .cta-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(111,78,55,0.5); }
-        .cta-secondary {
-            background: rgba(244,235,225,0.08); color: var(--text-white);
-            border: 1px solid rgba(255,255,255,.18); border-radius: 50px;
-            padding: 16px 28px; font-size: 15px; font-weight: 700; cursor: pointer;
-            font-family: 'Plus Jakarta Sans', sans-serif; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 8px; transition: background .2s;
-        }
-        .cta-secondary:hover { background: rgba(244,235,225,0.15); }
-        .hero-float {
-            margin-top: 60px; display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
-            position: relative; z-index: 1;
-        }
-        .hero-stat {
-            background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
-            border-radius: 16px; padding: 18px 28px; text-align: center;
-        }
-        .hero-stat-num { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--bg-light); }
-        .hero-stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 4px; }
-
-        /* ══════════════════════════════════════
-           SECCIONES GENERALES
-        ══════════════════════════════════════ */
-        .page-section {
-            max-width: 1100px; margin: 0 auto; padding: 80px 24px;
-        }
-        .section-eyebrow {
-            font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase;
-            color: var(--accent-red); margin-bottom: 12px;
-        }
-        .section-heading {
-            font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 42px);
-            font-style: italic; color: var(--bg-light); margin-bottom: 16px; line-height: 1.2;
-        }
-        .section-lead {
-            font-size: 16px; color: rgba(255,255,255,.55); max-width: 520px; line-height: 1.7; font-weight: 500;
-        }
-        .section-divider {
-            border: none; border-top: 1px solid rgba(255,255,255,.06); margin: 0;
+        /* ══ SECCIONES HOME ══ */
+        .home-section { padding:20px 20px 0; }
+        .home-section-title {
+            font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.1em;
+            color:var(--muted); margin-bottom:14px;
         }
 
-        /* ══════════════════════════════════════
-           SECCIÓN MENÚ (ex-app-container)
-        ══════════════════════════════════════ */
-        #menu { background: var(--bg-dark); }
-        .menu-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px 60px; }
-        .menu-header { margin-bottom: 32px; }
+        /* ══ CARDS DE RESTAURANTE ══ */
+        .restaurantes-grid { display:flex; flex-direction:column; gap:14px; padding:0 20px 20px; }
 
-        .categories { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 4px; scrollbar-width: none; margin-top: 24px; }
-        .categories::-webkit-scrollbar { display: none; }
-        .category-chip {
-            background: rgba(244,235,225,0.07); color: var(--text-white);
-            padding: 10px 20px; border-radius: 30px; font-size: 14px; font-weight: 600;
-            white-space: nowrap; border: 1px solid rgba(255,255,255,.1); cursor: pointer; transition: all .2s;
-            flex-shrink: 0;
+        .rest-card {
+            background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+            overflow:hidden; cursor:pointer; transition:transform .2s, box-shadow .2s;
+            active-scale:.98;
         }
-        .category-chip.active { background: var(--bg-light); color: var(--text-dark); border-color: var(--bg-light); }
-
-        .products-grid { display: grid; grid-template-columns: 1fr; grid-auto-rows: min-content; gap: 16px; align-items: start; }
-        .section-title { font-family: 'Playfair Display', serif; font-size: 22px; margin-bottom: 20px; color: var(--bg-light); }
-
-        /* ── TARJETAS DE PRODUCTOS ── */
-        .products-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
-
-        .product-card {
-            background: var(--bg-light); border-radius: var(--radius-md); padding: 16px;
-            display: flex; align-items: center; gap: 16px;
-            transition: transform .2s, box-shadow .2s;
-            box-shadow: 0 4px 15px rgba(0,0,0,.1);
+        .rest-card:active { transform:scale(.98); }
+        .rest-card-cover {
+            height:140px; background:var(--card);
+            display:flex; align-items:center; justify-content:center;
+            font-size:64px; position:relative; overflow:hidden;
         }
-        .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,.2); }
-        .product-info { flex: 1; }
-        .product-name { color: var(--text-dark); font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-        .product-desc { color: var(--text-muted); font-size: 13px; line-height: 1.4; margin-bottom: 12px;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .product-price { color: var(--price-wine); font-weight: 700; font-size: 16px; }
-        .product-image-container { position: relative; width: 96px; height: 96px; flex-shrink: 0; }
-        .product-image-inner {
-            width: 100%; height: 100%; background: #E8D9C8; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 48px; overflow: hidden;
+        .rest-card-cover img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+        .rest-cerrado-badge {
+            position:absolute; inset:0; background:rgba(0,0,0,.6);
+            display:flex; align-items:center; justify-content:center;
+            font-size:13px; font-weight:800; color:#fff; letter-spacing:.08em;
         }
-        .product-image-inner img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .add-btn {
-            position: absolute; bottom: -12px; right: -12px;
-            background: var(--icon-red); color: var(--text-white);
-            width: 44px; height: 44px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 26px; font-weight: 500;
-            box-shadow: 0 4px 12px rgba(192,57,43,.5);
-            border: 3px solid var(--bg-light); cursor: pointer; transition: transform .1s; z-index: 2;
+        .rest-card-body { padding:14px 16px; }
+        .rest-card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+        .rest-nombre { font-size:16px; font-weight:800; color:var(--text); }
+        .rest-tipo { font-size:12px; color:var(--muted); font-weight:600; margin-top:2px; }
+        .rest-rating {
+            display:flex; align-items:center; gap:4px;
+            background:rgba(245,166,35,.12); border:1px solid rgba(245,166,35,.2);
+            border-radius:8px; padding:4px 8px; flex-shrink:0;
         }
-        .add-btn:active { transform: scale(.9); }
-
-        #cart-toggle { display: none; }
-
-        .sticky-cart { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 440px; background: var(--accent-red); color: var(--text-white); border-radius: 100px; padding: 16px 24px; display: none; justify-content: space-between; align-items: center; box-shadow: 0 8px 24px rgba(0,0,0,.4); cursor: pointer; z-index: 60; transition: background .3s; }
-        .sticky-cart:hover { background: #543C29; }
-        .cart-count { background: rgba(255,255,255,.25); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; font-weight: 700; }
-        .cart-label { font-weight: 600; font-size: 16px; }
-        .cart-total { font-weight: 700; font-size: 16px; }
-
-        .checkout-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.7); backdrop-filter: blur(5px); opacity: 0; visibility: hidden; transition: all .3s; z-index: 70; cursor: pointer; }
-        .checkout-modal { position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--bg-light); border-radius: var(--radius-lg) var(--radius-lg) 0 0; z-index: 80; transition: all .4s cubic-bezier(.175,.885,.32,1.1); color: var(--text-dark); box-shadow: 0 -10px 40px rgba(0,0,0,.3); display: flex; flex-direction: column; max-height: 90vh; }
-        #cart-toggle:checked ~ .checkout-overlay { opacity: 1; visibility: visible; }
-        #cart-toggle:checked ~ .checkout-modal { bottom: 0; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 28px 24px 16px; flex-shrink: 0; }
-        .modal-body   { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 24px 8px; overscroll-behavior: contain; }
-        .modal-footer { padding: 12px 24px 36px; flex-shrink: 0; background: var(--bg-light); border-top: 1px solid rgba(0,0,0,.06); }
-        .order-items  { overflow-y: auto; margin-bottom: 20px; padding-right: 4px; -webkit-overflow-scrolling: touch; }
-        .modal-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; }
-        .close-btn { width: 36px; height: 36px; background: rgba(0,0,0,.06); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; color: var(--text-dark); font-size: 14px; }
-        .order-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid rgba(0,0,0,.06); }
-        .item-qty { color: var(--text-dark); font-size: 15px; font-weight: 600; margin-right: 12px; background: rgba(0,0,0,.05); padding: 4px 10px; border-radius: 8px; }
-        .item-name { font-weight: 600; font-size: 14px; flex: 1; line-height: 1.2; padding-right: 10px; }
-        .item-price { font-weight: 700; color: var(--text-dark); margin-right: 12px; }
-        .qty-controls { display: flex; gap: 6px; }
-        .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(0,0,0,.08); font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-dark); transition: .2s; }
-        .qty-btn:active { background: rgba(0,0,0,.15); transform: scale(.9); }
-
-        .receipt-container { background: #EFE6D8; padding: 20px; border-radius: 12px; margin-bottom: 24px; }
-        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: var(--text-muted); font-weight: 500; }
-        .receipt-total { display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 2px dashed rgba(0,0,0,.15); font-size: 20px; font-weight: 800; color: var(--text-dark); }
-
-        .field-label { font-size: .78rem; font-weight: 800; color: var(--accent-red); margin-bottom: 8px; letter-spacing: .03em; text-transform: uppercase; }
-        .nombre-campo { width: 100%; border: 1px solid rgba(0,0,0,.1); outline: none; font-family: 'Plus Jakarta Sans', sans-serif; font-size: .95rem; font-weight: 600; color: var(--text-dark); background: var(--text-white); border-radius: 12px; padding: 12px 14px; margin-bottom: 4px; transition: border-color .2s; }
-        .nombre-campo:focus { border-color: var(--accent-red); }
-        .nombre-campo.campo-invalido { border-color: #E53E3E; background: #FFF5F5; }
-        .nombre-campo::placeholder { color: var(--text-muted); font-weight: 600; }
-        .campo-error { font-size: 12px; font-weight: 700; color: #C53030; min-height: 18px; margin-bottom: 8px; padding-left: 4px; }
-
-        .entrega-opciones { display: flex; gap: 10px; margin-bottom: 16px; }
-        .entrega-btn { flex: 1; background: var(--text-white); border: 2px solid rgba(0,0,0,.08); border-radius: 14px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all .2s; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .entrega-btn .e-icon { font-size: 22px; display: block; margin-bottom: 4px; }
-        .entrega-btn .e-titulo { font-weight: 700; font-size: 13px; color: var(--text-dark); display: block; }
-        .entrega-btn .e-nota { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
-        .entrega-btn.active { border-color: var(--accent-red); background: #FBF3EA; }
-        .entrega-btn.active .e-titulo { color: var(--accent-red); }
-
-        .direccion-wrapper { display: none; margin-bottom: 8px; }
-        .direccion-wrapper.show { display: block; }
-        .direccion-campo { width: 100%; border: 1px solid rgba(0,0,0,.1); outline: none; resize: none; font-family: 'Plus Jakarta Sans', sans-serif; font-size: .9rem; font-weight: 500; color: var(--text-dark); background: var(--text-white); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
-        .direccion-campo:focus { border-color: var(--accent-red); }
-        .btn-ubicacion { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: rgba(111,78,55,.08); color: var(--accent-red); border: 1px dashed var(--accent-red); border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 20px; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .btn-ubicacion:active { background: rgba(111,78,55,.15); }
-
-        .whatsapp-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: #25D366; color: white; padding: 18px; border-radius: var(--radius-md); font-size: 17px; font-weight: 700; text-decoration: none; box-shadow: 0 8px 20px rgba(37,211,102,.3); transition: transform .2s, opacity .2s; cursor: pointer; }
-        .whatsapp-btn:hover { transform: translateY(-2px); background: #20BD5A; }
-        .whatsapp-btn.disabled { opacity: .6; pointer-events: none; transform: none; }
-
-        /* ── MODAL DE CONFIRMACIÓN FINAL ── */
-        .confirm-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(5px);
-            opacity: 0; visibility: hidden; transition: all .25s; z-index: 130; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; padding: 20px;
+        .rest-rating span { font-size:12px; font-weight:800; color:var(--accent2); }
+        .rest-info { display:flex; gap:12px; flex-wrap:wrap; }
+        .rest-pill {
+            display:flex; align-items:center; gap:5px;
+            font-size:12px; font-weight:600; color:var(--text2);
         }
-        .confirm-overlay.open { opacity: 1; visibility: visible; }
-        .confirm-modal {
-            background: var(--bg-light); color: var(--text-dark); border-radius: var(--radius-lg);
-            width: 100%; max-width: 380px; padding: 28px 24px; cursor: default;
-            transform: scale(.92) translateY(10px); opacity: 0;
-            transition: transform .25s cubic-bezier(.175,.885,.32,1.1), opacity .25s;
-            box-shadow: 0 20px 50px rgba(0,0,0,.35);
+        .rest-pill.abierto { color:var(--green); }
+        .rest-pill.cerrado { color:var(--accent); }
+
+        /* ══ EMPTY SEARCH ══ */
+        .empty-search { text-align:center; padding:48px 20px; color:var(--muted); }
+        .empty-search-icon { font-size:40px; margin-bottom:12px; opacity:.5; }
+        .empty-search-txt { font-size:14px; font-weight:600; }
+
+        /* ══ VISTA MENÚ (restaurante individual) ══ */
+        /* Navbar del menú */
+        .navbar-menu {
+            position:sticky; top:0; z-index:100;
+            background:rgba(26,26,46,.96); backdrop-filter:blur(16px);
+            border-bottom:1px solid var(--border);
+            height:60px; display:flex; align-items:center; gap:12px; padding:0 16px;
         }
-        .confirm-overlay.open .confirm-modal { transform: scale(1) translateY(0); opacity: 1; }
-        .confirm-title { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; margin-bottom: 4px; }
-        .confirm-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
-        .confirm-resumen { background: var(--bg-cream2); border-radius: 14px; padding: 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 9px; }
-        .confirm-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; }
-        .confirm-row strong { color: var(--text-dark); flex-shrink: 0; }
-        .confirm-row span { text-align: right; color: var(--text-muted); font-weight: 600; word-break: break-word; }
-        .confirm-total-row { display: flex; justify-content: space-between; align-items: center; font-size: 17px; font-weight: 800; padding-top: 10px; margin-top: 2px; border-top: 2px dashed rgba(0,0,0,.15); }
-        .confirm-actions { display: flex; gap: 10px; }
-        .confirm-btn-editar { flex: 1; background: rgba(0,0,0,.06); color: var(--text-dark); border: none; border-radius: 12px; padding: 14px; font-weight: 700; font-size: 13.5px; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; }
-        .confirm-btn-enviar {
-            flex: 1.5; background: #25D366; color: white; border: none; border-radius: 12px; padding: 14px;
-            font-weight: 800; font-size: 13.5px; cursor: pointer; display: flex; align-items: center;
-            justify-content: center; gap: 8px; font-family: 'Plus Jakarta Sans', sans-serif;
-            box-shadow: 0 8px 20px rgba(37,211,102,.3); transition: opacity .2s;
+        .btn-volver {
+            background:var(--surface); border:1px solid var(--border);
+            border-radius:10px; width:36px; height:36px; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center;
+            font-size:18px; cursor:pointer; transition:all .2s; color:var(--text);
         }
-        .confirm-btn-enviar.disabled { opacity: .6; pointer-events: none; }
+        .btn-volver:hover { border-color:var(--accent); }
+        .navbar-menu-nombre { font-size:15px; font-weight:800; flex:1; }
+        .navbar-menu-pedidos { position:relative; background:none; border:none; font-size:20px; cursor:pointer; color:var(--text2); }
+
+        /* Hero del menú */
+        .menu-hero {
+            padding:24px 20px 0;
+            background:linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+            border-bottom:1px solid var(--border); margin-bottom:4px;
+        }
+        .menu-hero-top { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+        .menu-rest-icon { width:60px; height:60px; border-radius:14px; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; border:1px solid var(--border); overflow:hidden; }
+        .menu-rest-icon img { width:100%; height:100%; object-fit:cover; }
+        .menu-rest-nombre { font-size:20px; font-weight:800; }
+        .menu-rest-tipo { font-size:13px; color:var(--text2); font-weight:500; margin-top:2px; }
+        .menu-rest-pills { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+        .menu-rest-pill { font-size:12px; font-weight:600; color:var(--text2); display:flex; align-items:center; gap:4px; }
+        .menu-rest-pill.abierto { color:var(--green); }
+        .menu-rest-pill.cerrado { color:var(--accent); }
 
         /* Banner horario */
-        .horario-banner { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 10px 16px; margin: 16px 0 28px; border-radius: 12px; width: fit-content; }
-        .horario-banner.cerrado { background: rgba(224,84,84,.14); color: #FF8A7A; border: 1px solid rgba(224,84,84,.3); }
-        .horario-banner.abierto { background: rgba(37,200,122,.12); color: #4FE0A0; border: 1px solid rgba(37,200,122,.25); }
+        .horario-banner {
+            display:flex; align-items:center; gap:10px; border-radius:10px;
+            padding:10px 14px; font-size:13px; font-weight:600; margin-bottom:14px;
+        }
+        .horario-banner.abierto { background:rgba(37,200,122,.1); color:var(--green); border:1px solid rgba(37,200,122,.2); }
+        .horario-banner.cerrado { background:rgba(233,69,96,.1); color:var(--accent); border:1px solid rgba(233,69,96,.2); }
 
-        /* Toast pedido listo */
-        .toast-listo { position: fixed; top: 76px; left: 50%; transform: translateX(-50%) translateY(calc(-200% - 76px)); background: #25C87A; color: #0E2A1C; font-weight: 800; font-size: 14px; padding: 14px 22px; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.35); z-index: 50; display: flex; align-items: center; gap: 10px; transition: transform .35s cubic-bezier(.34,1.56,.64,1); max-width: calc(100% - 32px); }
-        .toast-listo.show { transform: translateX(-50%) translateY(0); }
+        /* Categorías menú */
+        .menu-cats {
+            display:flex; gap:8px; overflow-x:auto; padding-bottom:14px; scrollbar-width:none;
+        }
+        .menu-cats::-webkit-scrollbar { display:none; }
+        .menu-cat-chip {
+            flex-shrink:0; background:var(--surface); border:1px solid var(--border);
+            border-radius:20px; padding:7px 14px; font-size:13px; font-weight:700;
+            color:var(--text2); cursor:pointer; transition:all .2s;
+        }
+        .menu-cat-chip.active { background:var(--accent); border-color:var(--accent); color:#fff; }
 
-        /* Modal mis pedidos */
-        .mp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(5px); opacity: 0; visibility: hidden; transition: all .3s; z-index: 110; cursor: pointer; }
-        .mp-overlay.open { opacity: 1; visibility: visible; }
+        /* Productos */
+        .menu-main { padding:8px 20px 120px; }
+        .menu-section-title { font-size:18px; font-weight:800; margin:24px 0 12px; color:var(--text); }
+        .products-grid { display:flex; flex-direction:column; gap:10px; }
+
+        .product-card {
+            background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+            display:flex; align-items:center; gap:12px; padding:14px;
+            transition:border-color .2s;
+        }
+        .product-card:active { transform:scale(.99); }
+        .product-info { flex:1; min-width:0; }
+        .product-name { font-size:14px; font-weight:800; color:var(--text); margin-bottom:4px; }
+        .product-desc { font-size:12px; color:var(--text2); line-height:1.4; margin-bottom:8px; }
+        .product-price { font-size:15px; font-weight:800; color:var(--accent2); }
+        .product-img-wrap {
+            width:80px; height:80px; flex-shrink:0; border-radius:12px;
+            background:var(--card); position:relative;
+            display:flex; align-items:center; justify-content:center; font-size:32px; overflow:hidden;
+        }
+        .product-img-wrap img { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
+        .btn-add {
+            position:absolute; bottom:-1px; right:-1px;
+            width:28px; height:28px; border-radius:8px 0 12px 0;
+            background:var(--accent); color:#fff; border:none;
+            font-size:18px; font-weight:700; cursor:pointer;
+            display:flex; align-items:center; justify-content:center;
+            transition:background .2s; line-height:1;
+        }
+        .btn-add:active { background:#c93a54; transform:scale(.92); }
+
+        /* ══ CARRITO STICKY ══ */
+        .sticky-cart {
+            position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+            background:var(--accent); color:#fff; border-radius:16px;
+            display:none; align-items:center; gap:10px;
+            padding:14px 20px; box-shadow:0 8px 32px rgba(233,69,96,.4);
+            cursor:pointer; z-index:200; min-width:260px; justify-content:space-between;
+            transition:transform .2s, box-shadow .2s;
+        }
+        .sticky-cart:active { transform:translateX(-50%) scale(.97); }
+        .cart-cnt { background:rgba(0,0,0,.25); border-radius:8px; padding:3px 9px; font-size:13px; font-weight:800; }
+        .cart-lbl { font-size:14px; font-weight:700; }
+        .cart-total-lbl { font-size:14px; font-weight:800; }
+
+        /* ══ MODAL CARRITO ══ */
+        .cart-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:300;
+            opacity:0; pointer-events:none; transition:opacity .25s;
+        }
+        .cart-overlay.show { opacity:1; pointer-events:all; }
+        .cart-modal {
+            position:fixed; bottom:0; left:0; right:0; z-index:301;
+            background:var(--bg2); border-radius:24px 24px 0 0;
+            border-top:1px solid var(--border);
+            max-height:90vh; overflow-y:auto;
+            transform:translateY(100%); transition:transform .3s cubic-bezier(.32,1.2,.56,1);
+        }
+        .cart-modal.show { transform:translateY(0); }
+        .cart-modal-header {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:20px 20px 0; position:sticky; top:0; background:var(--bg2); z-index:1;
+        }
+        .cart-modal-title { font-size:18px; font-weight:800; }
+        .cart-close { background:var(--surface); border:none; border-radius:10px; width:34px; height:34px; font-size:18px; cursor:pointer; color:var(--text2); display:flex; align-items:center; justify-content:center; }
+        .cart-body { padding:16px 20px; }
+
+        /* Items en carrito */
+        .cart-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+        .cart-item:last-child { border-bottom:none; }
+        .cart-item-name { flex:1; font-size:14px; font-weight:700; color:var(--text); }
+        .cart-item-precio { font-size:14px; font-weight:700; color:var(--accent2); min-width:54px; text-align:right; }
+        .qty-wrap { display:flex; align-items:center; gap:6px; }
+        .qty-btn { width:28px; height:28px; border-radius:8px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-size:16px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; }
+        .qty-btn:hover { border-color:var(--accent); color:var(--accent); }
+        .qty-num { font-size:14px; font-weight:800; min-width:20px; text-align:center; }
+
+        /* Formulario checkout */
+        .checkout-section { margin-top:16px; }
+        .field-label { font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:6px; margin-top:14px; }
+        .campo {
+            width:100%; background:var(--surface); border:1px solid var(--border);
+            border-radius:10px; padding:12px 14px; color:var(--text);
+            font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:600;
+            outline:none; transition:border-color .2s; margin-bottom:4px;
+        }
+        .campo::placeholder { color:var(--muted); font-weight:500; }
+        .campo:focus { border-color:var(--accent); }
+        .campo.invalido { border-color:var(--accent); background:rgba(233,69,96,.05); }
+        .campo-error { font-size:12px; color:var(--accent); font-weight:700; min-height:16px; margin-bottom:6px; padding-left:2px; }
+
+        /* Entrega */
+        .entrega-opts { display:flex; gap:8px; margin-bottom:4px; }
+        .entrega-opt {
+            flex:1; background:var(--surface); border:1px solid var(--border);
+            border-radius:12px; padding:12px 10px; cursor:pointer; transition:all .2s; text-align:center;
+        }
+        .entrega-opt.active { border-color:var(--accent); background:rgba(233,69,96,.08); }
+        .e-icon { font-size:20px; display:block; margin-bottom:4px; }
+        .e-titulo { font-size:13px; font-weight:800; color:var(--text); display:block; }
+        .e-nota { font-size:11px; color:var(--muted); font-weight:600; display:block; margin-top:2px; }
+        .entrega-opt.active .e-nota { color:var(--accent); }
+
+        .dir-wrap { display:none; margin-top:4px; }
+        .dir-wrap.show { display:block; }
+        .textarea-campo {
+            width:100%; background:var(--surface); border:1px solid var(--border);
+            border-radius:10px; padding:12px 14px; color:var(--text);
+            font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:500;
+            outline:none; resize:none; transition:border-color .2s;
+        }
+        .textarea-campo::placeholder { color:var(--muted); }
+        .textarea-campo:focus { border-color:var(--accent); }
+        .btn-gps {
+            margin-top:8px; background:none; border:1px solid var(--border); color:var(--text2);
+            border-radius:10px; padding:9px 14px; font-size:13px; font-weight:600; cursor:pointer;
+            font-family:'Plus Jakarta Sans',sans-serif; width:100%; transition:all .2s;
+        }
+        .btn-gps:hover { border-color:var(--accent); color:var(--accent); }
+
+        /* Receipt */
+        .receipt { margin-top:16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; }
+        .receipt-row { display:flex; justify-content:space-between; font-size:13px; color:var(--text2); padding:4px 0; font-weight:600; }
+        .receipt-total { display:flex; justify-content:space-between; font-size:16px; font-weight:800; color:var(--text); padding:10px 0 0; border-top:1px solid var(--border); margin-top:6px; }
+
+        /* Botón enviar */
+        .btn-wa {
+            width:100%; margin-top:14px; padding:15px; border-radius:14px;
+            background:#25D366; color:#0d1f14; border:none;
+            font-family:'Plus Jakarta Sans',sans-serif; font-size:15px; font-weight:800;
+            cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px;
+            transition:background .2s;
+        }
+        .btn-wa:hover { background:#20bd5a; }
+        .btn-wa:active { transform:scale(.98); }
+        .btn-wa.disabled { opacity:.5; pointer-events:none; }
+
+        /* ══ MODAL CONFIRMACIÓN ══ */
+        .confirm-overlay {
+            position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:400;
+            display:flex; align-items:center; justify-content:center; padding:20px;
+            opacity:0; pointer-events:none; transition:opacity .2s;
+        }
+        .confirm-overlay.show { opacity:1; pointer-events:all; }
+        .confirm-box {
+            background:var(--bg2); border:1px solid var(--border); border-radius:20px;
+            padding:28px 24px; max-width:360px; width:100%;
+            transform:scale(.92) translateY(12px);
+            transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+        }
+        .confirm-overlay.show .confirm-box { transform:scale(1) translateY(0); }
+        .confirm-title { font-size:18px; font-weight:800; margin-bottom:4px; }
+        .confirm-sub { font-size:13px; color:var(--text2); margin-bottom:16px; }
+        .confirm-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
+        .confirm-row strong { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.08em; }
+        .confirm-row span { font-weight:700; text-align:right; max-width:60%; }
+        .confirm-total { display:flex; justify-content:space-between; font-size:17px; font-weight:800; padding-top:12px; color:var(--accent2); }
+        .confirm-actions { display:flex; gap:10px; margin-top:16px; }
+        .btn-revisar { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; font-size:14px; font-weight:700; color:var(--text2); cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif; transition:all .15s; }
+        .btn-revisar:hover { border-color:rgba(255,255,255,.2); color:var(--text); }
+        .btn-confirmar {
+            flex:2; background:#25D366; color:#0d1f14; border:none; border-radius:12px;
+            padding:12px; font-size:14px; font-weight:800; cursor:pointer;
+            font-family:'Plus Jakarta Sans',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .15s;
+        }
+        .btn-confirmar:hover { background:#20bd5a; }
+        .btn-confirmar.disabled { opacity:.5; pointer-events:none; }
+
+        /* ══ MIS PEDIDOS MODAL ══ */
+        .mp-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:500; display:none; }
+        .mp-overlay.open { display:block; }
         .mp-modal {
-            position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh;
-            background: var(--bg-light); color: var(--text-dark);
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            padding: 28px 22px 36px; z-index: 115;
-            transition: bottom .4s cubic-bezier(.175,.885,.32,1.1), right .4s cubic-bezier(.175,.885,.32,1.1);
-            box-shadow: 0 -10px 40px rgba(0,0,0,.3); display: flex; flex-direction: column; overflow: hidden;
+            position:fixed; top:0; right:0; bottom:0; width:min(380px,100%);
+            background:var(--bg2); border-left:1px solid var(--border);
+            z-index:501; transform:translateX(100%);
+            transition:transform .3s cubic-bezier(.32,1,.56,1);
+            display:flex; flex-direction:column; overflow:hidden;
         }
-        .mp-modal.open { bottom: 0; }
-        @media (min-width: 768px) {
-            .mp-modal {
-                top: 0; bottom: 0 !important; left: auto; right: -450px; width: 450px;
-                height: 100vh; max-height: 100vh; border-radius: 0; padding: 40px 32px;
-                transition: right .4s cubic-bezier(.175,.885,.32,1.1);
-            }
-            .mp-modal.open { right: 0; bottom: 0 !important; }
+        .mp-modal.open { transform:translateX(0); }
+        .mp-header { padding:20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+        .mp-title { font-size:18px; font-weight:800; }
+        .mp-close { background:var(--surface); border:none; border-radius:10px; width:34px; height:34px; font-size:18px; cursor:pointer; color:var(--text2); display:flex; align-items:center; justify-content:center; }
+        .mp-list { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+        .mp-empty { text-align:center; padding:40px 20px; color:var(--muted); font-size:14px; }
+
+        .mp-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; }
+        .mp-card.es-listo { border-color:var(--green); box-shadow:0 0 0 1px rgba(37,200,122,.2); animation:mpPulse 2s ease-in-out infinite; }
+        @keyframes mpPulse { 0%,100% { box-shadow:0 0 0 1px rgba(37,200,122,.2); } 50% { box-shadow:0 0 0 3px rgba(37,200,122,.3); } }
+        .mp-card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+        .mp-card-fecha { font-size:11px; color:var(--muted); font-weight:600; }
+        .mp-card-rest { font-size:12px; color:var(--text2); font-weight:700; margin-top:2px; }
+        .mp-estado { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.05em; padding:3px 8px; border-radius:6px; }
+        .mp-estado-pendiente  { background:rgba(245,166,35,.15); color:var(--accent2); }
+        .mp-estado-preparando { background:rgba(79,163,224,.15); color:#4FA3E0; }
+        .mp-estado-listo      { background:rgba(37,200,122,.15); color:var(--green); }
+        .mp-estado-mandadero_asignado { background:rgba(249,115,22,.15); color:#F97316; }
+        .mp-estado-en_camino  { background:rgba(167,139,250,.15); color:#A78BFA; }
+        .mp-estado-entregado  { background:rgba(90,106,133,.15); color:var(--muted); }
+        .mp-estado-cancelado  { background:rgba(233,69,96,.15); color:var(--accent); }
+        .mp-card-items { font-size:13px; color:var(--text2); margin-bottom:8px; line-height:1.4; }
+        .mp-card-total { font-size:15px; font-weight:800; color:var(--text); }
+        .mp-progreso { display:flex; gap:4px; margin-top:10px; }
+        .mp-progreso span { flex:1; height:4px; border-radius:2px; background:var(--border); transition:background .4s; }
+        .mp-progreso span.on { background:var(--green); }
+
+        /* ══ TOAST ══ */
+        .toast {
+            position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+            background:var(--surface); border:1px solid var(--green); border-radius:12px;
+            padding:12px 20px; font-size:14px; font-weight:700; color:var(--text);
+            z-index:600; opacity:0; pointer-events:none; transition:all .3s; white-space:nowrap;
+            box-shadow:0 8px 24px rgba(0,0,0,.4);
         }
-        .mp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .mp-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
-        .mp-list { overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
-        .mp-empty { text-align: center; color: var(--text-muted); padding: 30px 10px; font-size: 14px; }
-        .mp-card { background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
-        .mp-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
-        .mp-card-fecha { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .mp-card-items { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px; }
-        .mp-card-total { font-weight: 800; font-size: 14px; }
-        .mp-estado { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
-        .mp-estado-pendiente  { background: rgba(232,168,56,.15); color: #B07A1E; }
-        .mp-estado-preparando { background: rgba(79,163,224,.15); color: #2C77AC; }
-        .mp-estado-listo      { background: rgba(37,200,122,.15); color: #1B9760; }
-        .mp-estado-mandadero_asignado { background: rgba(249,115,22,.15); color: #c45700; }
-        .mp-estado-en_camino  { background: rgba(167,139,250,.15); color: #7C5BC4; }
-        .mp-estado-entregado  { background: rgba(136,136,160,.15); color: #6F6F8A; }
-        .mp-estado-cancelado  { background: rgba(224,84,84,.15); color: #C03A3A; }
-        .mp-tiempo-est { font-size: 12px; font-weight: 700; color: #c45700; margin-bottom: 6px; }
-        .mp-progreso { display: flex; gap: 4px; margin-top: 10px; }
-        .mp-progreso span { flex: 1; height: 4px; border-radius: 4px; background: rgba(0,0,0,.08); }
-        .mp-progreso span.on { background: var(--accent-red); }
-        .mp-card.es-listo { animation: mpPulso 1.4s ease-in-out infinite; }
-        @keyframes mpPulso { 0%,100% { box-shadow: 0 2px 10px rgba(0,0,0,.06); } 50% { box-shadow: 0 0 0 4px rgba(37,200,122,.35); } }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-        /* ══════════════════════════════════════
-           SECCIÓN NOSOTROS
-        ══════════════════════════════════════ */
-        #nosotros { background: var(--bg-mid); }
-        .nosotros-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
-        .nosotros-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-top: 48px; }
-        .nosotros-valores { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 40px; }
-        .valor-card { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07); border-radius: 16px; padding: 20px; }
-        .valor-icon { font-size: 26px; margin-bottom: 10px; }
-        .valor-title { font-weight: 800; font-size: 14px; color: var(--bg-light); margin-bottom: 6px; }
-        .valor-desc { font-size: 13px; color: rgba(255,255,255,.45); line-height: 1.5; }
-        .nosotros-visual {
-            background: linear-gradient(135deg, rgba(111,78,55,.3) 0%, rgba(44,26,20,.8) 100%);
-            border: 1px solid rgba(255,255,255,.07);
-            border-radius: 24px; padding: 40px; display: flex; flex-direction: column;
-            gap: 20px; align-items: center; text-align: center;
-        }
-        .nosotros-visual-icon { font-size: 64px; }
-        .nosotros-visual-title { font-family: 'Playfair Display', serif; font-size: 24px; font-style: italic; color: var(--bg-light); }
-        .nosotros-visual-text { font-size: 14px; color: rgba(255,255,255,.5); line-height: 1.7; }
-
-        /* ══════════════════════════════════════
-           SECCIÓN CONTACTO
-        ══════════════════════════════════════ */
-        #contacto { background: var(--bg-dark); }
-        .contacto-inner { max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
-        .contacto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 48px; align-items: start; }
-        .info-block { display: flex; flex-direction: column; gap: 20px; }
-        .info-item { display: flex; align-items: flex-start; gap: 16px; }
-        .info-icon { width: 44px; height: 44px; background: rgba(111,78,55,.18); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .info-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--accent-red); margin-bottom: 4px; }
-        .info-value { font-size: 15px; font-weight: 600; color: var(--bg-light); line-height: 1.5; }
-        .horario-tabla { display: flex; flex-direction: column; gap: 6px; margin-top: 24px; }
-        .horario-fila { display: flex; justify-content: space-between; font-size: 13px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
-        .horario-fila:last-child { border-bottom: none; }
-        .horario-dia { font-weight: 700; color: rgba(255,255,255,.6); }
-        .horario-hora { font-weight: 600; color: var(--bg-light); }
-        .horario-hora.cerrado { color: rgba(255,255,255,.25); }
-        .contacto-cta { background: rgba(111,78,55,.12); border: 1px solid rgba(111,78,55,.25); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 16px; }
-        .contacto-cta-title { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: var(--bg-light); }
-        .contacto-cta-sub { font-size: 14px; color: rgba(255,255,255,.5); line-height: 1.6; }
-        .btn-wa-contacto { display: flex; align-items: center; justify-content: center; gap: 10px; background: #25D366; color: white; padding: 14px 24px; border-radius: 14px; font-size: 15px; font-weight: 800; text-decoration: none; border: none; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: opacity .2s, transform .2s; }
-        .btn-wa-contacto:hover { opacity: .9; transform: translateY(-1px); }
-
-        /* ══════════════════════════════════════
-           FOOTER
-        ══════════════════════════════════════ */
-        .site-footer { background: #1A0F0D; padding: 32px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,.05); }
-        .footer-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; margin-bottom: 8px; }
-        .footer-logo span { color: var(--accent-red); }
-        .footer-copy { font-size: 12px; color: rgba(255,255,255,.25); font-weight: 500; }
-
-        /* ══════════════════════════════════════
-           RESPONSIVE
-        ══════════════════════════════════════ */
-        @media (min-width: 768px) {
-            .products-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-            .checkout-modal { top: 0; bottom: 0; left: auto; right: -450px; width: 450px; height: 100vh; max-height: 100vh; border-radius: 0; }
-            .modal-header { padding: 36px 32px 16px; }
-            .modal-body { padding: 0 32px 8px; }
-            .modal-footer { padding: 12px 32px 40px; }
-            #cart-toggle:checked ~ .checkout-modal { right: 0; bottom: 0; }
-        }
-
-        @media (max-width: 900px) {
-            .nosotros-grid  { grid-template-columns: 1fr; gap: 40px; }
-            .contacto-grid  { grid-template-columns: 1fr; }
-            .nav-links      { display: none; }
-            .hamburger      { display: flex; }
-        }
-
-        @media (max-width: 600px) {
-            .nosotros-valores { grid-template-columns: 1fr; }
-            .hero-float { gap: 12px; }
-            .hero-stat { padding: 14px 20px; }
-        }
-        /* ══ ALERTAS CUSTOM ══ */
+        /* ══ SNACK ══ */
         .snack {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
-            background: #2C1A14; color: var(--bg-light); font-size: 14px; font-weight: 600;
-            padding: 14px 20px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0,0,0,.5);
-            z-index: 300; display: flex; align-items: center; gap: 10px; max-width: calc(100% - 40px);
-            opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
-            border: 1px solid rgba(255,255,255,.08);
+            position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+            background:var(--surface); border-radius:12px; padding:12px 20px;
+            font-size:13px; font-weight:700; color:var(--text); z-index:700;
+            opacity:0; pointer-events:none; transition:all .3s; text-align:center;
+            max-width:calc(100% - 40px); box-shadow:0 8px 24px rgba(0,0,0,.4);
         }
-        .snack.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .snack.error  { border-left: 4px solid #E05454; }
-        .snack.info   { border-left: 4px solid #4FA3E0; }
-        .snack.success{ border-left: 4px solid #25C87A; }
+        .snack.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .snack.error { border:1px solid var(--accent); }
+        .snack.info  { border:1px solid var(--muted); }
 
-        .custom-confirm-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
-            z-index: 400; display: flex; align-items: center; justify-content: center;
+        /* ══ RESPONSIVE ══ */
+        @media (min-width: 600px) {
+            .restaurantes-grid { display:grid; grid-template-columns:repeat(2,1fr); }
+            .cart-modal { max-width:480px; margin:0 auto; }
+            .mp-modal { width:420px; }
+        }
+
+        /* ── MODAL CONFIRMACIÓN CUSTOM ── */
+        .cc-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+            z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px;
             opacity: 0; visibility: hidden; transition: all .2s;
         }
-        .custom-confirm-overlay.show { opacity: 1; visibility: visible; }
-        .custom-confirm-box {
-            background: var(--bg-light); color: var(--text-dark); border-radius: 20px;
-            padding: 28px 24px; max-width: 320px; width: calc(100% - 48px);
-            box-shadow: 0 20px 60px rgba(0,0,0,.4); transform: scale(.94);
-            transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+        .cc-overlay.show { opacity: 1; visibility: visible; }
+        .cc-box {
+            background: #fff; color: #1A0F0D;
+            border-radius: 20px; padding: 28px 24px;
+            max-width: 320px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,.4);
+            transform: scale(.94); transition: transform .25s cubic-bezier(.34,1.56,.64,1);
         }
-        .custom-confirm-overlay.show .custom-confirm-box { transform: scale(1); }
-        .custom-confirm-icon { font-size: 36px; margin-bottom: 12px; }
-        .custom-confirm-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-        .custom-confirm-msg { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
-        .custom-confirm-btns { display: flex; gap: 10px; }
-        .custom-confirm-btns button {
-            flex: 1; padding: 13px; border-radius: 12px; font-size: 14px; font-weight: 800;
-            cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; border: none; transition: opacity .15s;
+        .cc-overlay.show .cc-box { transform: scale(1); }
+        .cc-icon  { font-size: 36px; margin-bottom: 10px; }
+        .cc-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .cc-msg   { font-size: 14px; color: #7A5C53; line-height: 1.6; margin-bottom: 22px; }
+        .cc-btns  { display: flex; gap: 10px; }
+        .cc-btns button {
+            flex: 1; padding: 13px; border-radius: 12px;
+            font-size: 14px; font-weight: 800; cursor: pointer;
+            font-family: 'Plus Jakarta Sans', sans-serif; border: none; transition: opacity .15s;
         }
-        .custom-confirm-btns button:active { opacity: .8; }
-        .btn-confirm-cancel { background: rgba(0,0,0,.07); color: var(--text-muted); }
-        .btn-confirm-ok     { background: var(--accent-red); color: #fff; }
-        .btn-confirm-ok.danger { background: #C0392B; }
-
+        .cc-btns button:active { opacity: .8; }
+        .cc-cancel { background: rgba(0,0,0,.07); color: #7A5C53; }
+        .cc-ok     { background: var(--accent); color: #fff; }
+        .cc-ok.danger { background: #C0392B; }
+        .mp-tiempo-est { font-size:12px; font-weight:700; color:var(--accent2); margin:4px 0 2px; }
     </style>
 </head>
 <body>
 
-<!-- ── SPLASH SCREEN ── -->
+<!-- SPLASH -->
 <div id="splash">
-    <div class="splash-logo">Café <span>Aroma</span></div>
-    <div class="splash-tagline">Cada sorbo, una experiencia</div>
+    <div class="splash-logo">Nuevo<span>Eats</span></div>
+    <div class="splash-sub">Pide a domicilio</div>
     <div class="splash-dots">
         <div class="splash-dot"></div>
         <div class="splash-dot"></div>
@@ -560,327 +492,313 @@
     </div>
 </div>
 
-<!-- ══ NAVBAR ══ -->
-<nav class="navbar">
-    <a href="#inicio" class="nav-logo">Café <span>Aroma</span></a>
-    <ul class="nav-links">
-        <li><a href="#inicio">Inicio</a></li>
-        <li><a href="#menu">Menú</a></li>
-        <li><a href="#nosotros">Nosotros</a></li>
-        <li><a href="#contacto">Contacto</a></li>
-    </ul>
-    <div class="nav-right">
-        <button type="button" id="btn-mis-pedidos" class="nav-pedidos-btn" onclick="abrirMisPedidos()">
-            📦 Mis pedidos
-            <span class="mis-pedidos-badge" id="mis-pedidos-badge" style="display:none;">0</span>
+<!-- ════════════════════ VISTA HOME ════════════════════ -->
+<div id="vista-home" class="vista activa">
+    <nav class="navbar-home">
+        <div class="brand">Nuevo<span>Eats</span></div>
+        <button class="nav-pedidos-btn" onclick="abrirMisPedidos()" title="Mis pedidos">
+            🧾
+            <div class="nav-badge" id="home-badge"></div>
         </button>
-        <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menú">
-            <span></span><span></span><span></span>
-        </button>
-    </div>
-</nav>
+    </nav>
 
-<!-- Menú mobile -->
-<div class="mobile-menu" id="mobile-menu">
-    <a href="#inicio" onclick="cerrarMenu()">Inicio</a>
-    <a href="#menu" onclick="cerrarMenu()">Menú</a>
-    <a href="#nosotros" onclick="cerrarMenu()">Nosotros</a>
-    <a href="#contacto" onclick="cerrarMenu()">Contacto</a>
-    <button class="mobile-pedidos-btn" onclick="cerrarMenu(); abrirMisPedidos()">📦 Mis pedidos</button>
+    <div class="home-hero">
+        <div class="hero-eyebrow">📍 Entrega a domicilio</div>
+        <div class="hero-title">¿Qué se te <span>antoja</span> hoy?</div>
+        <div class="hero-sub">Elige tu restaurante favorito y recibe tu pedido en la puerta.</div>
+    </div>
+
+    <div class="search-wrap">
+        <input type="search" class="search-box" id="buscador" placeholder="Buscar restaurante o tipo de comida…" oninput="filtrarRestaurantes()" autocomplete="off">
+    </div>
+
+    <div class="home-section">
+        <div class="home-section-title">Restaurantes</div>
+    </div>
+
+    <div class="restaurantes-grid" id="restaurantes-grid"></div>
 </div>
 
-<!-- ══ HERO / INICIO ══ -->
-<section id="inicio">
-    <div class="hero-bg"></div>
-    <div class="hero-eyebrow">Café artesanal · Durango</div>
-    <h1 class="hero-title">Donde cada<br>taza es <span>un ritual</span></h1>
-    <p class="hero-sub">Granos seleccionados, recetas de autor y el calor de siempre. Pide a domicilio o pasa a recoger, en minutos.</p>
-    <div class="hero-ctas">
-        <a href="#menu" class="cta-primary">☕ Ver el menú</a>
-        <a href="#nosotros" class="cta-secondary">Conocernos →</a>
-    </div>
-    <div class="hero-float">
-        <div class="hero-stat">
-            <div class="hero-stat-num">100%</div>
-            <div class="hero-stat-label">Grano arábica</div>
-        </div>
-        <div class="hero-stat">
-            <div class="hero-stat-num">+5 años</div>
-            <div class="hero-stat-label">Sirviendo café</div>
-        </div>
-        <div class="hero-stat">
-            <div class="hero-stat-num">🛵</div>
-            <div class="hero-stat-label">Envío a domicilio</div>
-        </div>
-    </div>
-</section>
+<!-- ════════════════════ VISTA MENÚ ════════════════════ -->
+<div id="vista-menu" class="vista">
+    <nav class="navbar-menu">
+        <button class="btn-volver" onclick="volverHome()">←</button>
+        <span class="navbar-menu-nombre" id="menu-nav-nombre"></span>
+        <button class="navbar-menu-pedidos" onclick="abrirMisPedidos()">
+            🧾 <div class="nav-badge" id="menu-badge"></div>
+        </button>
+    </nav>
 
-<hr class="section-divider">
-
-<!-- ══ MENÚ ══ -->
-<section id="menu">
-<div class="menu-inner">
-    <div class="menu-header">
-        <div class="section-eyebrow">Lo que preparamos</div>
-        <h2 class="section-heading">Nuestro menú</h2>
-        <p class="section-lead">Cafés, chocolates y horneados listos para ti. Añade lo que quieras y ordena directo por WhatsApp.</p>
-        <div class="horario-banner" id="horario-banner" style="display:none;">
-            <span id="horario-banner-icono">🕒</span>
+    <div class="menu-hero">
+        <div class="menu-hero-top">
+            <div class="menu-rest-icon" id="menu-rest-icon"></div>
+            <div>
+                <div class="menu-rest-nombre" id="menu-rest-nombre"></div>
+                <div class="menu-rest-tipo" id="menu-rest-tipo"></div>
+                <div class="menu-rest-pills" id="menu-rest-pills"></div>
+            </div>
+        </div>
+        <div class="horario-banner" id="horario-banner">
+            <span id="horario-banner-icono">🟢</span>
             <span id="horario-banner-texto"></span>
         </div>
-        <div class="categories" id="categories-container">
-            <div class="category-chip active" data-cat="Todos">Todos</div>
-        </div>
+        <div class="menu-cats" id="menu-cats"></div>
     </div>
-    <main id="menu-container"></main>
+
+    <div class="menu-main" id="menu-main"></div>
 </div>
-</section>
 
-<hr class="section-divider">
+<!-- ══ CARRITO STICKY ══ -->
+<div class="sticky-cart" id="sticky-cart" onclick="abrirCarrito()">
+    <span class="cart-cnt" id="cart-cnt">0</span>
+    <span class="cart-lbl">Ver carrito</span>
+    <span class="cart-total-lbl" id="cart-total-lbl">$0.00</span>
+</div>
 
-<!-- ══ NOSOTROS ══ -->
-<section id="nosotros">
-<div class="nosotros-inner">
-    <div class="section-eyebrow">Nuestra historia</div>
-    <h2 class="section-heading">Más que café,<br>un lugar para quedarte</h2>
-    <p class="section-lead">Nacimos de la pasión por el buen café y la convicción de que cada visita debe sentirse especial.</p>
-
-    <div class="nosotros-grid">
-        <div>
-            <p style="color:rgba(255,255,255,.55);font-size:15px;line-height:1.8;margin-bottom:20px;">
-                Café Aroma abrió sus puertas con una idea sencilla: servir café de verdad, hecho con tiempo, con granos cuidadosamente seleccionados y con la calidez de siempre. Con los años sumamos chocolates, horneados y recetas propias que hoy son parte de la rutina de muchas familias duranguenses.
-            </p>
-            <p style="color:rgba(255,255,255,.55);font-size:15px;line-height:1.8;">
-                Hoy también llevamos esa experiencia hasta tu puerta. Pedidos por WhatsApp, seguimiento en tiempo real y entregas rápidas para que no pierdas ni un sorbo de ese momento.
-            </p>
-            <div class="nosotros-valores">
-                <div class="valor-card">
-                    <div class="valor-icon">🌱</div>
-                    <div class="valor-title">Origen</div>
-                    <div class="valor-desc">Granos 100% arábica de productores mexicanos.</div>
-                </div>
-                <div class="valor-card">
-                    <div class="valor-icon">🔥</div>
-                    <div class="valor-title">Artesanal</div>
-                    <div class="valor-desc">Cada preparación, hecha con técnica y amor.</div>
-                </div>
-                <div class="valor-card">
-                    <div class="valor-icon">🏘️</div>
-                    <div class="valor-title">Local</div>
-                    <div class="valor-desc">Nacimos en Durango y aquí seguimos creciendo.</div>
-                </div>
-                <div class="valor-card">
-                    <div class="valor-icon">⚡</div>
-                    <div class="valor-title">Rápido</div>
-                    <div class="valor-desc">Tu pedido confirmado en minutos, sin complicaciones.</div>
-                </div>
-            </div>
-        </div>
-        <div class="nosotros-visual">
-            <div class="nosotros-visual-icon">☕</div>
-            <div class="nosotros-visual-title">La taza perfecta empieza con el grano correcto</div>
-            <div class="nosotros-visual-text">Seleccionamos, tostamos y preparamos cada café para que llegue a ti en su mejor momento. Sin atajos, sin compromisos.</div>
-        </div>
+<!-- ══ MODAL CARRITO ══ -->
+<div class="cart-overlay" id="cart-overlay" onclick="cerrarCarrito()"></div>
+<div class="cart-modal" id="cart-modal">
+    <div class="cart-modal-header">
+        <div class="cart-modal-title">Tu pedido</div>
+        <button class="cart-close" onclick="cerrarCarrito()">✕</button>
     </div>
-</div>
-</section>
-
-<hr class="section-divider">
-
-<!-- ══ CONTACTO ══ -->
-<section id="contacto">
-<div class="contacto-inner">
-    <div class="section-eyebrow">Encuéntranos</div>
-    <h2 class="section-heading">Contacto & horarios</h2>
-    <p class="section-lead">Estamos aquí para atenderte. Escríbenos, visítanos o haz tu pedido directo desde el menú.</p>
-
-    <div class="contacto-grid">
-        <div class="info-block">
-            <div class="info-item">
-                <div class="info-icon">📍</div>
-                <div>
-                    <div class="info-label">Dirección</div>
-                    <div class="info-value">Av. Principal #123, Col. Centro<br>Durango, Dgo.</div>
+    <div class="cart-body">
+        <div id="cart-items"></div>
+        <div class="checkout-section">
+            <div class="field-label">Tu nombre</div>
+            <input type="text" id="input-nombre" class="campo" placeholder="¿A nombre de quién?" maxlength="40" autocomplete="name">
+            <div class="campo-error" id="err-nombre"></div>
+            <div class="field-label">Tu teléfono</div>
+            <input type="tel" id="input-tel" class="campo" placeholder="10 dígitos" maxlength="10" inputmode="numeric" autocomplete="tel">
+            <div class="campo-error" id="err-tel"></div>
+            <div class="field-label">Entrega</div>
+            <div class="entrega-opts">
+                <div class="entrega-opt" id="opt-domicilio" onclick="seleccionarEntrega('domicilio')">
+                    <span class="e-icon">🛵</span>
+                    <span class="e-titulo">A domicilio</span>
+                    <span class="e-nota" id="nota-envio">+$0.00</span>
+                </div>
+                <div class="entrega-opt" id="opt-recoger" onclick="seleccionarEntrega('recoger')">
+                    <span class="e-icon">🏬</span>
+                    <span class="e-titulo">Recoger ahí</span>
+                    <span class="e-nota">Sin costo extra</span>
                 </div>
             </div>
-            <div class="info-item">
-                <div class="info-icon">📱</div>
-                <div>
-                    <div class="info-label">WhatsApp</div>
-                    <div class="info-value">+52 871 402 4914</div>
-                </div>
+            <div class="dir-wrap" id="dir-wrap">
+                <div class="field-label" style="margin-top:12px">Dirección</div>
+                <textarea id="input-dir" class="textarea-campo" rows="2" maxlength="200" placeholder="Calle, número, colonia, referencia"></textarea>
+                <button type="button" class="btn-gps" onclick="solicitarUbicacion()">📍 Usar mi ubicación</button>
             </div>
-            <div class="info-item">
-                <div class="info-icon">🕒</div>
-                <div>
-                    <div class="info-label">Horario</div>
-                    <div class="info-value" style="font-size:13px;">Ver tabla →</div>
-                </div>
+            <div class="receipt" id="receipt">
+                <div class="receipt-row"><span>Subtotal</span><span id="r-subtotal">$0.00</span></div>
+                <div class="receipt-row"><span>Envío</span><span id="r-envio">$0.00</span></div>
+                <div class="receipt-total"><span>Total</span><span id="r-total">$0.00</span></div>
             </div>
-            <div class="horario-tabla">
-                <div class="horario-fila"><span class="horario-dia">Lunes – Viernes</span><span class="horario-hora">8:00 – 20:00</span></div>
-                <div class="horario-fila"><span class="horario-dia">Sábado</span><span class="horario-hora">9:00 – 21:00</span></div>
-                <div class="horario-fila"><span class="horario-dia">Domingo</span><span class="horario-hora">10:00 – 20:00</span></div>
-            </div>
-        </div>
-
-        <div class="contacto-cta">
-            <div class="contacto-cta-title">¿Quieres hacer un pedido o tienes alguna pregunta?</div>
-            <div class="contacto-cta-sub">Escríbenos directo por WhatsApp. Te respondemos en minutos durante nuestro horario de atención.</div>
-            <a href="https://wa.me/528714024914" target="_blank" class="btn-wa-contacto">
+            <button type="button" class="btn-wa" id="btn-pedido" onclick="abrirConfirmacion()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                Escribirnos por WhatsApp
-            </a>
-            <a href="#menu" class="cta-primary" style="border-radius:14px;justify-content:center;">☕ Hacer un pedido</a>
-        </div>
-    </div>
-</div>
-</section>
-
-<!-- ══ FOOTER ══ -->
-<footer class="site-footer">
-    <div class="footer-logo">Café <span>Aroma</span></div>
-    <div class="footer-copy">© 2025 Café Aroma · Durango, México · Todos los derechos reservados</div>
-</footer>
-
-<!-- Carrito sticky -->
-<input type="checkbox" id="cart-toggle" autocomplete="off">
-<label for="cart-toggle" class="sticky-cart" id="sticky-cart">
-    <div class="cart-count" id="cart-count">0</div>
-    <div class="cart-label">Ver carrito</div>
-    <div class="cart-total" id="cart-total-bar">$0.00</div>
-</label>
-
-<label for="cart-toggle" class="checkout-overlay"></label>
-<div class="checkout-modal">
-    <div class="modal-header">
-        <h2 class="modal-title">Tu Pedido</h2>
-        <label for="cart-toggle" class="close-btn">✕</label>
-    </div>
-    <div class="modal-body">
-        <div class="order-items" id="order-items-container"></div>
-        <p class="field-label">Tu nombre</p>
-        <input type="text" id="cliente-nombre" class="nombre-campo" placeholder="¿A nombre de quién es el pedido?" maxlength="40" autocomplete="name">
-        <div class="campo-error" id="error-nombre"></div>
-        <p class="field-label" style="margin-top:12px">Tu teléfono</p>
-        <input type="tel" id="cliente-telefono" class="nombre-campo" placeholder="10 dígitos" maxlength="10" inputmode="numeric" autocomplete="tel">
-        <div class="campo-error" id="error-telefono"></div>
-        <p class="field-label" style="margin-top:12px">Entrega</p>
-        <div class="entrega-opciones">
-            <div class="entrega-btn" id="entrega-domicilio" onclick="seleccionarEntrega('domicilio')">
-                <span class="e-icon">🛵</span>
-                <span class="e-titulo">A domicilio</span>
-                <span class="e-nota">+$25.00</span>
-            </div>
-            <div class="entrega-btn" id="entrega-recoger" onclick="seleccionarEntrega('recoger')">
-                <span class="e-icon">🏬</span>
-                <span class="e-titulo">Recoger ahí</span>
-                <span class="e-nota">Sin costo extra</span>
-            </div>
-        </div>
-        <div class="direccion-wrapper" id="direccion-wrapper">
-            <textarea id="direccion-campo" class="direccion-campo" rows="2" maxlength="200" placeholder="Calle, número, colonia y alguna referencia"></textarea>
-            <button type="button" class="btn-ubicacion" id="btn-ubicacion" onclick="solicitarUbicacion()">📍 Usar mi ubicación actual</button>
-        </div>
-        <div class="receipt-container">
-            <div class="receipt-row"><span>Subtotal</span><span id="receipt-subtotal">$0.00</span></div>
-            <div class="receipt-row"><span id="receipt-envio-label">Costo de envío</span><span id="receipt-envio">$0.00</span></div>
-            <div class="receipt-total"><span>Total</span><span id="receipt-total">$0.00</span></div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a class="whatsapp-btn" id="btn-enviar-pedido" onclick="abrirConfirmacionPedido();">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            <span id="btn-enviar-pedido-texto">Enviar pedido por WhatsApp</span>
-        </a>
-    </div>
-</div>
-
-<!-- Confirmación final antes de WhatsApp -->
-<div class="confirm-overlay" id="confirm-overlay" onclick="cerrarConfirmacion()">
-    <div class="confirm-modal" onclick="event.stopPropagation()">
-        <div class="confirm-title">¿Confirmas tu pedido?</div>
-        <div class="confirm-sub">Revisa que todo esté correcto antes de enviarlo.</div>
-        <div class="confirm-resumen">
-            <div class="confirm-row"><strong>Nombre</strong><span id="confirm-nombre">—</span></div>
-            <div class="confirm-row"><strong>Teléfono</strong><span id="confirm-telefono">—</span></div>
-            <div class="confirm-row"><strong>Entrega</strong><span id="confirm-entrega">—</span></div>
-            <div class="confirm-row" id="confirm-direccion-row" style="display:none;"><strong>Dirección</strong><span id="confirm-direccion">—</span></div>
-            <div class="confirm-total-row"><span>Total</span><span id="confirm-total">$0.00</span></div>
-        </div>
-        <div class="confirm-actions">
-            <button type="button" class="confirm-btn-editar" onclick="cerrarConfirmacion()">✏️ Revisar</button>
-            <button type="button" class="confirm-btn-enviar" id="confirm-btn-enviar" onclick="confirmarYEnviarPedido()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                <span id="confirm-btn-enviar-texto">Sí, enviar pedido</span>
+                Enviar pedido por WhatsApp
             </button>
         </div>
     </div>
 </div>
 
-<!-- Mis pedidos modal -->
-<div class="mp-overlay" id="mp-overlay" onclick="cerrarMisPedidos()"></div>
-<div class="mp-modal" id="mp-modal">
-    <div class="mp-header">
-        <h2 class="mp-title">Mis pedidos</h2>
-        <div class="close-btn" onclick="cerrarMisPedidos()">✕</div>
-    </div>
-    <div class="mp-list" id="mp-list">
-        <div class="mp-empty">Aún no has hecho ningún pedido.</div>
-    </div>
-</div>
-
-<!-- Toast pedido listo -->
-<div class="toast-listo" id="toast-listo">
-    🎉 <span id="toast-listo-texto">¡Tu pedido ya está listo!</span>
-</div>
-
-<div class="snack" id="snack"></div>
-
-<div class="custom-confirm-overlay" id="custom-confirm-overlay">
-    <div class="custom-confirm-box">
-        <div class="custom-confirm-icon" id="cc-icon">⚠️</div>
-        <div class="custom-confirm-title" id="cc-title">¿Estás seguro?</div>
-        <div class="custom-confirm-msg" id="cc-msg"></div>
-        <div class="custom-confirm-btns">
-            <button class="btn-confirm-cancel" id="cc-cancel">Cancelar</button>
-            <button class="btn-confirm-ok" id="cc-ok">Aceptar</button>
+<!-- ══ CONFIRMACIÓN ══ -->
+<div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+        <div class="confirm-title">¿Confirmas tu pedido?</div>
+        <div class="confirm-sub">Revisa que todo esté correcto.</div>
+        <div id="confirm-rows"></div>
+        <div class="confirm-total"><span>Total</span><span id="confirm-total">$0.00</span></div>
+        <div class="confirm-actions">
+            <button class="btn-revisar" onclick="cerrarConfirmacion()">✏️ Revisar</button>
+            <button class="btn-confirmar" id="btn-confirmar" onclick="confirmarYEnviar()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Sí, enviar
+            </button>
         </div>
     </div>
 </div>
 
+<!-- ══ MIS PEDIDOS ══ -->
+<div class="mp-overlay" id="mp-overlay" onclick="cerrarMisPedidos()"></div>
+<div class="mp-modal" id="mp-modal">
+    <div class="mp-header">
+        <div class="mp-title">Mis pedidos</div>
+        <button class="mp-close" onclick="cerrarMisPedidos()">✕</button>
+    </div>
+    <div class="mp-list" id="mp-list"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="snack" id="snack"></div>
+
 <script>
-function toggleMenu() {
-    const h = document.getElementById('hamburger');
-    const m = document.getElementById('mobile-menu');
-    h.classList.toggle('open');
-    m.classList.toggle('open');
-}
-function cerrarMenu() {
-    document.getElementById('hamburger').classList.remove('open');
-    document.getElementById('mobile-menu').classList.remove('open');
-}
+// ════════════════════════════════════════════════════════════
+//  ⚙️  CONFIGURACIÓN — edita aquí
+// ════════════════════════════════════════════════════════════
+const RESTAURANTES = [
+    {
+        id: 'cafe-aroma',
+        nombre: 'Café Aroma',
+        tipo: 'Cafetería · Postres',
+        emoji: '☕',
+        cover: '',                          // ruta a imagen de portada (opcional)
+        logo:  '',                          // ruta a logo (opcional)
+        rating: 4.8,
+        tiempoMin: 20,
+        costoEnvio: 25,
+        whatsapp: '528714024914',           // ⚠️ número real con código de país
+        categorias: ['Café', 'Chocolates', 'Panadería', 'Frescos'],
+        horario: {
+            lunes:    { open: '08:00', close: '20:00' },
+            martes:   { open: '08:00', close: '20:00' },
+            miercoles:{ open: '08:00', close: '20:00' },
+            jueves:   { open: '08:00', close: '20:00' },
+            viernes:  { open: '08:00', close: '20:00' },
+            sabado:   { open: '09:00', close: '21:00' },
+            domingo:  { open: '10:00', close: '18:00' },
+        },
+        productos: [
+            { id:1,  emoji:'☕', nombre:'Americano',           precio:35, categoria:'Café',      desc:'Café negro de grano 100% arábica, suave y aromático.' },
+            { id:2,  emoji:'🥛', nombre:'Latte Vainilla',      precio:48, categoria:'Café',      desc:'Espresso con leche cremosa y un toque de vainilla natural.' },
+            { id:3,  emoji:'☕', nombre:'Capuchino Clásico',   precio:45, categoria:'Café',      desc:'Espresso, leche vaporizada y espuma tupida con canela.' },
+            { id:20, emoji:'🍫', nombre:'Chocolatísimo Magnum',precio:100,categoria:'Chocolates',desc:'Especial Magnum – Explosión de chocolate. ¡El más pedido!' },
+            { id:21, emoji:'🍫', nombre:'Chocolate Caliente',  precio:42, categoria:'Chocolates',desc:'Chocolate cremoso preparado con leche entera, bien espumoso.' },
+            { id:30, emoji:'🥐', nombre:'Croissant de Mantequilla',precio:32,categoria:'Panadería',desc:'Hojaldrado, recién horneado todas las mañanas.' },
+            { id:31, emoji:'🍰', nombre:'Pastel de Zanahoria', precio:55, categoria:'Panadería', desc:'Rebanada de pastel casero con betún de queso crema.' },
+            { id:40, emoji:'🍓', nombre:'Frappé de Fresa',     precio:50, categoria:'Frescos',  desc:'Fresa natural licuada con hielo y un toque de crema.' },
+            { id:41, emoji:'🍋', nombre:'Limonada Mineral',    precio:30, categoria:'Frescos',  desc:'Limón recién exprimido con agua mineral bien fría.' },
+        ]
+    },
+    {
+        id: 'taqueria-don-pepe',
+        nombre: 'Taquería Don Pepe',
+        tipo: 'Tacos · Antojitos',
+        emoji: '🌮',
+        cover: '',
+        logo:  '',
+        rating: 4.6,
+        tiempoMin: 25,
+        costoEnvio: 30,
+        whatsapp: '521XXXXXXXXXX',          // ⚠️ reemplazar con número real
+        categorias: ['Tacos', 'Tortas', 'Bebidas'],
+        horario: {
+            lunes:    { open: '10:00', close: '22:00' },
+            martes:   { open: '10:00', close: '22:00' },
+            miercoles:{ open: '10:00', close: '22:00' },
+            jueves:   { open: '10:00', close: '22:00' },
+            viernes:  { open: '10:00', close: '23:00' },
+            sabado:   { open: '10:00', close: '23:00' },
+            domingo:  { open: '11:00', close: '21:00' },
+        },
+        productos: [
+            { id:101, emoji:'🌮', nombre:'Taco de Bistec',       precio:18, categoria:'Tacos',   desc:'Bistec a la plancha con cebolla y cilantro en tortilla de maíz.' },
+            { id:102, emoji:'🌮', nombre:'Taco de Pastor',        precio:18, categoria:'Tacos',   desc:'Carne de pastor marinada con piña, cebolla y cilantro.' },
+            { id:103, emoji:'🌮', nombre:'Taco de Suadero',       precio:18, categoria:'Tacos',   desc:'Suadero dorado, jugoso y lleno de sabor.' },
+            { id:104, emoji:'🌮', nombre:'Orden de 5 Tacos',      precio:85, categoria:'Tacos',   desc:'Elige tu carne favorita · ahorra $5 vs unitario.' },
+            { id:110, emoji:'🥪', nombre:'Torta de Bistec',       precio:65, categoria:'Tortas',  desc:'Pan telera con bistec, frijoles, aguacate, jitomate y cebolla.' },
+            { id:111, emoji:'🥪', nombre:'Torta de Pastor',       precio:65, categoria:'Tortas',  desc:'Carne de pastor con todo en pan telera crujiente.' },
+            { id:120, emoji:'🥤', nombre:'Agua Fresca (1L)',      precio:25, categoria:'Bebidas', desc:'Jamaica, horchata o limón — la que esté del día.' },
+            { id:121, emoji:'🥤', nombre:'Refresco',              precio:20, categoria:'Bebidas', desc:'Coca-Cola, Sprite o Manzanita Sol bien fría.' },
+        ]
+    },
+    {
+        id: 'pizzeria-napoli',
+        nombre: 'Pizzería Nápoli',
+        tipo: 'Pizza · Italiana',
+        emoji: '🍕',
+        cover: '',
+        logo:  '',
+        rating: 4.7,
+        tiempoMin: 30,
+        costoEnvio: 35,
+        whatsapp: '521XXXXXXXXXX',          // ⚠️ reemplazar con número real
+        categorias: ['Pizzas', 'Entradas', 'Bebidas'],
+        horario: {
+            lunes:    null,                 // null = cerrado ese día
+            martes:   { open: '13:00', close: '22:00' },
+            miercoles:{ open: '13:00', close: '22:00' },
+            jueves:   { open: '13:00', close: '22:00' },
+            viernes:  { open: '13:00', close: '23:00' },
+            sabado:   { open: '12:00', close: '23:00' },
+            domingo:  { open: '12:00', close: '22:00' },
+        },
+        productos: [
+            { id:201, emoji:'🍕', nombre:'Pizza Margarita (Chica)', precio:95,  categoria:'Pizzas',   desc:'Salsa de tomate, mozzarella fresca y albahaca. Clásica italiana.' },
+            { id:202, emoji:'🍕', nombre:'Pizza Margarita (Grande)',precio:155, categoria:'Pizzas',   desc:'La misma clásica pero para compartir entre 3-4 personas.' },
+            { id:203, emoji:'🍕', nombre:'Pizza Pepperoni (Chica)', precio:110, categoria:'Pizzas',   desc:'Doble pepperoni, mozzarella derretida sobre salsa de tomate.' },
+            { id:204, emoji:'🍕', nombre:'Pizza Pepperoni (Grande)',precio:175, categoria:'Pizzas',   desc:'Pepperoni generoso para toda la familia.' },
+            { id:205, emoji:'🍕', nombre:'Pizza 4 Quesos (Grande)', precio:180, categoria:'Pizzas',   desc:'Mozzarella, gouda, manchego y parmesano. Irresistible.' },
+            { id:210, emoji:'🥖', nombre:'Pan de Ajo',              precio:45,  categoria:'Entradas', desc:'Pan baguette horneado con mantequilla de ajo y perejil.' },
+            { id:211, emoji:'🥗', nombre:'Ensalada César',          precio:60,  categoria:'Entradas', desc:'Lechuga romana, crutones, parmesano y aderezo César casero.' },
+            { id:220, emoji:'🥤', nombre:'Refresco 355ml',          precio:25,  categoria:'Bebidas',  desc:'Coca-Cola, Sprite o Fanta bien fría.' },
+            { id:221, emoji:'🍺', nombre:'Cerveza',                 precio:35,  categoria:'Bebidas',  desc:'Modelo, Corona o Pacífico — la que traigamos.' },
+        ]
+    }
+];
 
-// ── Snack (reemplaza alert) ──
-let snackTimer = null;
-function showSnack(msg, tipo = 'error', duracion = 3500) {
+// ⚠️ Firebase config — MISMA que en pedidoosnew.html y mandaderosF.html
+const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyD6J9IiySIkqYOPISKtefMd0mGKiQRlu4g",
+    authDomain: "cafe-fresa.firebaseapp.com",
+    projectId: "cafe-fresa",
+    storageBucket: "cafe-fresa.firebasestorage.app",
+    messagingSenderId: "230005643477",
+    appId: "1:230005643477:web:ef80758814e259c8cf6a5c"
+};
+
+const ANTISPAM_MAX = 3;
+const ANTISPAM_MIN = 60;
+
+// ════════════════════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ════════════════════════════════════════════════════════════
+let restActivo    = null;   // objeto restaurante seleccionado
+let carrito       = [];
+let tipoEntrega   = localStorage.getItem('ne_entrega') || null;
+let catActiva     = 'Todos';
+let enviando      = false;
+let historial     = JSON.parse(localStorage.getItem('ne_historial') || '[]');
+let suscripciones = {};
+
+// ════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+let snackTimer;
+function showSnack(msg, tipo='info', ms=3500) {
     const el = document.getElementById('snack');
-    el.textContent = msg;
-    el.className = `snack ${tipo} show`;
+    el.textContent = msg; el.className = `snack ${tipo} show`;
     clearTimeout(snackTimer);
-    snackTimer = setTimeout(() => el.classList.remove('show'), duracion);
+    snackTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+// ── Persistencia del carrito ──────────────────────────────
+function guardarCarrito() {
+    if (restActivo) {
+        localStorage.setItem('ne_carrito_' + restActivo.id, JSON.stringify(carrito));
+    }
+    if (tipoEntrega) localStorage.setItem('ne_entrega', tipoEntrega);
 }
 
-// ── Confirm personalizado ──
-function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', okText = 'Aceptar', cancelText = 'Cancelar', danger = false } = {}) {
+function restaurarCarrito(restId) {
+    const guardado = localStorage.getItem('ne_carrito_' + restId);
+    if (guardado) {
+        try { return JSON.parse(guardado); } catch(e) { return []; }
+    }
+    return [];
+}
+
+// ── Confirm modal personalizado (reemplaza confirm() nativo) ──
+function showConfirm({ icon='⚠️', title='¿Estás seguro?', msg='', okText='Aceptar', cancelText='Cancelar', danger=false } = {}) {
     return new Promise(resolve => {
-        const overlay = document.getElementById('custom-confirm-overlay');
+        const overlay = document.getElementById('cc-overlay');
         document.getElementById('cc-icon').textContent  = icon;
         document.getElementById('cc-title').textContent = title;
         document.getElementById('cc-msg').textContent   = msg;
         const okBtn = document.getElementById('cc-ok');
         okBtn.textContent = okText;
-        okBtn.className = 'btn-confirm-ok' + (danger ? ' danger' : '');
+        okBtn.className = 'cc-ok' + (danger ? ' danger' : '');
         document.getElementById('cc-cancel').textContent = cancelText;
         overlay.classList.add('show');
         const close = (result) => {
@@ -893,915 +811,712 @@ function showConfirm({ icon = '⚠️', title = '¿Estás seguro?', msg = '', ok
         document.getElementById('cc-cancel').onclick = () => close(false);
     });
 }
+
+function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// ════════════════════════════════════════════════════════════
+//  NAVEGACIÓN HOME ↔ MENÚ
+// ════════════════════════════════════════════════════════════
+function mostrarVista(id) {
+    document.querySelectorAll('.vista').forEach(v => v.classList.remove('activa'));
+    document.getElementById(id).classList.add('activa');
+    window.scrollTo(0, 0);
+}
+
+function abrirRestaurante(restId) {
+    const rest = RESTAURANTES.find(r => r.id === restId);
+    if (!rest) return;
+    restActivo = rest;
+    carrito = restaurarCarrito(restId);       // restaurar carrito persistido
+    catActiva = 'Todos';
+    if (tipoEntrega) seleccionarEntrega(tipoEntrega);  // restaurar tipo entrega
+    renderMenuVista();
+    actualizarCarritoUI();
+    mostrarVista('vista-menu');
+}
+
+function volverHome() {
+    guardarCarrito();                          // persiste antes de salir
+    restActivo = null;
+    carrito = [];
+    actualizarCarritoUI();
+    mostrarVista('vista-home');
+}
+
+// ════════════════════════════════════════════════════════════
+//  HORARIO
+// ════════════════════════════════════════════════════════════
+const DIAS = ['domingo','lunes','martes','miercoles','jueves','viernes','sabado'];
+
+function estadoHorario(rest) {
+    const ahora = new Date();
+    const diaKey = DIAS[ahora.getDay()];
+    const slot = rest.horario[diaKey];
+    if (!slot) return { abierto: false, mensaje: 'Hoy estamos cerrados.' };
+    const [oh, om] = slot.open.split(':').map(Number);
+    const [ch, cm] = slot.close.split(':').map(Number);
+    const mins = ahora.getHours() * 60 + ahora.getMinutes();
+    const abre = oh * 60 + om;
+    const cierra = ch * 60 + cm;
+    if (mins >= abre && mins < cierra) {
+        const restMin = cierra - mins;
+        return { abierto: true, mensaje: `Abierto · Cierra a las ${slot.close}${restMin <= 30 ? ` (${restMin} min)` : ''}` };
+    }
+    if (mins < abre) return { abierto: false, mensaje: `Abre hoy a las ${slot.open}` };
+    // buscar próximo día
+    for (let d = 1; d <= 7; d++) {
+        const nextKey = DIAS[(ahora.getDay() + d) % 7];
+        const nextSlot = rest.horario[nextKey];
+        if (nextSlot) return { abierto: false, mensaje: `Abre el ${nextKey} a las ${nextSlot.open}` };
+    }
+    return { abierto: false, mensaje: 'Temporalmente cerrado.' };
+}
+
+// ════════════════════════════════════════════════════════════
+//  HOME
+// ════════════════════════════════════════════════════════════
+function renderHome() {
+    filtrarRestaurantes();
+}
+
+
+function filtrarRestaurantes() {
+    const q = (document.getElementById('buscador').value || '').toLowerCase().trim();
+    const grid = document.getElementById('restaurantes-grid');
+
+    let lista = RESTAURANTES.filter(r => {
+        return !q || r.nombre.toLowerCase().includes(q) || r.tipo.toLowerCase().includes(q);
+    });
+    if (lista.length === 0) {
+        grid.innerHTML = `<div class="empty-search"><div class="empty-search-icon">🔍</div><div class="empty-search-txt">No encontramos "${esc(q)}"</div></div>`;
+        return;
+    }
+
+    grid.innerHTML = lista.map(r => {
+        const horario = estadoHorario(r);
+        const cover = r.cover
+            ? `<img src="${esc(r.cover)}" alt="${esc(r.nombre)}">`
+            : r.emoji;
+        const cerradoBadge = !horario.abierto ? `<div class="rest-cerrado-badge">🔴 Cerrado</div>` : '';
+        return `
+        <div class="rest-card" onclick="abrirRestaurante('${r.id}')">
+            <div class="rest-card-cover">${cover}${cerradoBadge}</div>
+            <div class="rest-card-body">
+                <div class="rest-card-top">
+                    <div>
+                        <div class="rest-nombre">${esc(r.nombre)}</div>
+                        <div class="rest-tipo">${esc(r.tipo)}</div>
+                    </div>
+                    <div class="rest-rating"><span>⭐ ${r.rating}</span></div>
+                </div>
+                <div class="rest-info">
+                    <div class="rest-pill ${horario.abierto?'abierto':'cerrado'}">
+                        ${horario.abierto?'🟢':'🔴'} ${horario.abierto?'Abierto':'Cerrado'}
+                    </div>
+                    <div class="rest-pill">🕐 ~${r.tiempoMin} min</div>
+                    <div class="rest-pill">🛵 $${r.costoEnvio} envío</div>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ════════════════════════════════════════════════════════════
+//  VISTA MENÚ
+// ════════════════════════════════════════════════════════════
+function renderMenuVista() {
+    const r = restActivo;
+    const horario = estadoHorario(r);
+
+    // Navbar
+    document.getElementById('menu-nav-nombre').textContent = r.nombre;
+
+    // Hero
+    const iconEl = document.getElementById('menu-rest-icon');
+    iconEl.innerHTML = r.logo ? `<img src="${esc(r.logo)}" alt="${esc(r.nombre)}">` : r.emoji;
+    document.getElementById('menu-rest-nombre').textContent = r.nombre;
+    document.getElementById('menu-rest-tipo').textContent   = r.tipo;
+    document.getElementById('menu-rest-pills').innerHTML =
+        `<div class="menu-rest-pill ${horario.abierto?'abierto':'cerrado'}">${horario.abierto?'🟢 Abierto':'🔴 Cerrado'}</div>
+         <div class="menu-rest-pill">🕐 ~${r.tiempoMin} min</div>
+         <div class="menu-rest-pill">🛵 $${r.costoEnvio} envío</div>`;
+
+    // Banner horario
+    const banner = document.getElementById('horario-banner');
+    banner.className = `horario-banner ${horario.abierto?'abierto':'cerrado'}`;
+    document.getElementById('horario-banner-icono').textContent = horario.abierto ? '🟢' : '🔴';
+    document.getElementById('horario-banner-texto').textContent = horario.mensaje;
+
+    // Chips categorías
+    const cats = ['Todos', ...new Set(r.productos.map(p => p.categoria))];
+    document.getElementById('menu-cats').innerHTML = cats.map(c =>
+        `<div class="menu-cat-chip ${catActiva===c?'active':''}" onclick="seleccionarCat('${esc(c)}')">${esc(c)}</div>`
+    ).join('');
+
+    renderProductos();
+}
+
+function seleccionarCat(cat) {
+    catActiva = cat;
+    document.querySelectorAll('.menu-cat-chip').forEach(c => c.classList.toggle('active', c.textContent.trim() === cat));
+    renderProductos();
+}
+
+function renderProductos() {
+    const r = restActivo;
+    const cats = [...new Set(r.productos.map(p => p.categoria))];
+    let html = '';
+    cats.forEach(cat => {
+        if (catActiva !== 'Todos' && catActiva !== cat) return;
+        html += `<div class="menu-section-title">${esc(cat)}</div><div class="products-grid">`;
+        r.productos.filter(p => p.categoria === cat).forEach(p => {
+            const img = p.imagen
+                ? `<img src="${esc(p.imagen)}" alt="${esc(p.nombre)}">`
+                : p.emoji || '🍽️';
+            html += `
+            <div class="product-card">
+                <div class="product-info">
+                    <div class="product-name">${esc(p.nombre)}</div>
+                    <div class="product-desc">${esc(p.desc||'')}</div>
+                    <div class="product-price">$${Number(p.precio).toFixed(2)}</div>
+                </div>
+                <div class="product-img-wrap">
+                    ${img}
+                    <button class="btn-add" onclick="agregarItem(${p.id})">+</button>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+    });
+    document.getElementById('menu-main').innerHTML = html || '<p style="text-align:center;color:var(--muted);padding:40px">Sin productos en esta categoría.</p>';
+}
+
+// ════════════════════════════════════════════════════════════
+//  CARRITO
+// ════════════════════════════════════════════════════════════
+function agregarItem(id) {
+    const prod = restActivo.productos.find(p => p.id === id);
+    if (!prod) return;
+    const ex = carrito.find(i => i.id === id);
+    if (ex) ex.cantidad++; else carrito.push({...prod, cantidad:1});
+    guardarCarrito();
+    actualizarCarritoUI();
+    showToast(`➕ ${prod.nombre} añadido`);
+}
+
+function cambiarCantidad(id, delta) {
+    const idx = carrito.findIndex(i => i.id === id);
+    if (idx < 0) return;
+    carrito[idx].cantidad += delta;
+    if (carrito[idx].cantidad <= 0) carrito.splice(idx, 1);
+    guardarCarrito();
+    actualizarCarritoUI();
+    renderCartItems();
+}
+
+function actualizarCarritoUI() {
+    const total = carrito.reduce((s,i) => s + i.precio * i.cantidad, 0);
+    const cnt   = carrito.reduce((s,i) => s + i.cantidad, 0);
+    const sticky = document.getElementById('sticky-cart');
+    if (cnt > 0) {
+        sticky.style.display = 'flex';
+        document.getElementById('cart-cnt').textContent = cnt;
+        document.getElementById('cart-total-lbl').textContent = `$${total.toFixed(2)}`;
+    } else {
+        sticky.style.display = 'none';
+        cerrarCarrito();
+    }
+    actualizarReceipt();
+}
+
+function actualizarReceipt() {
+    const subtotal = carrito.reduce((s,i) => s + i.precio * i.cantidad, 0);
+    const envio    = tipoEntrega === 'domicilio' ? (restActivo?.costoEnvio || 0) : 0;
+    const total    = subtotal + envio;
+    document.getElementById('r-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+    document.getElementById('r-envio').textContent    = `$${envio.toFixed(2)}`;
+    document.getElementById('r-total').textContent    = `$${total.toFixed(2)}`;
+    if (restActivo) document.getElementById('nota-envio').textContent = `+$${restActivo.costoEnvio}`;
+}
+
+function renderCartItems() {
+    const cont = document.getElementById('cart-items');
+    if (carrito.length === 0) { cont.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px;font-size:14px">El carrito está vacío 🛒</div>'; return; }
+    cont.innerHTML = carrito.map(i => `
+        <div class="cart-item">
+            <div class="cart-item-name">${esc(i.nombre)}</div>
+            <div class="qty-wrap">
+                <button class="qty-btn" onclick="cambiarCantidad(${i.id},-1)">−</button>
+                <span class="qty-num">${i.cantidad}</span>
+                <button class="qty-btn" onclick="cambiarCantidad(${i.id},1)">+</button>
+            </div>
+            <div class="cart-item-precio">$${(i.precio*i.cantidad).toFixed(2)}</div>
+        </div>`).join('');
+}
+
+function abrirCarrito() {
+    renderCartItems();
+    actualizarReceipt();
+    // restaurar campos guardados
+    document.getElementById('input-nombre').value = localStorage.getItem('ne_nombre') || '';
+    document.getElementById('input-tel').value    = localStorage.getItem('ne_tel') || '';
+    document.getElementById('input-dir').value    = localStorage.getItem('ne_dir') || '';
+    if (tipoEntrega) seleccionarEntrega(tipoEntrega);
+    document.getElementById('cart-overlay').classList.add('show');
+    document.getElementById('cart-modal').classList.add('show');
+    document.body.classList.add('modal-open');
+}
+
+function cerrarCarrito() {
+    document.getElementById('cart-overlay').classList.remove('show');
+    document.getElementById('cart-modal').classList.remove('show');
+    document.body.classList.remove('modal-open');
+}
+
+function seleccionarEntrega(tipo) {
+    tipoEntrega = tipo;
+    document.getElementById('opt-domicilio').classList.toggle('active', tipo==='domicilio');
+    document.getElementById('opt-recoger').classList.toggle('active',  tipo==='recoger');
+    document.getElementById('dir-wrap').classList.toggle('show', tipo==='domicilio');
+    localStorage.setItem('ne_entrega', tipo);
+    actualizarReceipt();
+}
+
+// GPS
+function solicitarUbicacion() {
+    if (!navigator.geolocation) {
+        showSnack('Tu navegador no soporta geolocalización. Escribe tu dirección manualmente.', 'info');
+        return;
+    }
+    const boton = document.getElementById('btn-gps');
+    const textoOriginal = boton ? boton.textContent : '';
+    if (boton) { boton.textContent = '📍 Obteniendo ubicación…'; boton.disabled = true; }
+
+    navigator.geolocation.getCurrentPosition(
+        pos => {
+            const { latitude: lat, longitude: lng } = pos.coords;
+            const link = `https://maps.google.com/?q=${lat},${lng}`;
+            const campo = document.getElementById('input-dir');
+            // Quita GPS anterior si ya había uno para no acumular links
+            const base = campo.value.replace(/\n?📍 GPS:\s*\S+/g, '').trim();
+            campo.value = base ? `${base}\n📍 GPS: ${link}` : `📍 GPS: ${link}`;
+            localStorage.setItem('ne_dir', campo.value);
+            if (boton) { boton.textContent = textoOriginal; boton.disabled = false; }
+        },
+        () => {
+            showSnack('No se pudo obtener tu ubicación. Escribe tu dirección manualmente.', 'info');
+            if (boton) { boton.textContent = textoOriginal; boton.disabled = false; }
+        }
+    );
+}
+
+// ════════════════════════════════════════════════════════════
+//  VALIDACIONES
+// ════════════════════════════════════════════════════════════
+function mostrarErr(campo, msg) {
+    document.getElementById('input-'+campo).classList.add('invalido');
+    document.getElementById('err-'+campo).textContent = msg;
+}
+function limpiarErr(campo) {
+    document.getElementById('input-'+campo).classList.remove('invalido');
+    document.getElementById('err-'+campo).textContent = '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('input-nombre').addEventListener('input', e => {
+        e.target.value = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]/g,'');
+        limpiarErr('nombre');
+        localStorage.setItem('ne_nombre', e.target.value);
+    });
+    document.getElementById('input-tel').addEventListener('input', e => {
+        e.target.value = e.target.value.replace(/\D/g,'').slice(0,10);
+        limpiarErr('tel');
+        if (/^\d{10}$/.test(e.target.value)) localStorage.setItem('ne_tel', e.target.value);
+    });
+    document.getElementById('input-dir').addEventListener('input', e => {
+        localStorage.setItem('ne_dir', e.target.value);
+    });
+});
+
+// ════════════════════════════════════════════════════════════
+//  ANTI-SPAM
+// ════════════════════════════════════════════════════════════
+function verificarAntispam() {
+    const clave = 'ne_envios'; const ahora = Date.now();
+    const lista = JSON.parse(localStorage.getItem(clave)||'[]');
+    const ventana = ANTISPAM_MIN * 60000;
+    const recientes = lista.filter(t => ahora - t < ventana);
+    if (recientes.length >= ANTISPAM_MAX) {
+        const min = Math.ceil((Math.min(...recientes) + ventana - ahora) / 60000);
+        showSnack(`⏳ Espera ${min} min antes de otro pedido.`, 'error', 4000);
+        return false;
+    }
+    return true;
+}
+function registrarEnvio() {
+    const clave = 'ne_envios'; const ahora = Date.now();
+    const ventana = ANTISPAM_MIN * 60000;
+    const lista = JSON.parse(localStorage.getItem(clave)||'[]').filter(t => ahora - t < ventana);
+    lista.push(ahora);
+    localStorage.setItem(clave, JSON.stringify(lista));
+}
+
+// ════════════════════════════════════════════════════════════
+//  CONFIRMACIÓN Y ENVÍO
+// ════════════════════════════════════════════════════════════
+function abrirConfirmacion() {
+    if (enviando) return;
+    const r = restActivo;
+
+    // Validar horario
+    const horario = estadoHorario(r);
+    if (!horario.abierto) { showSnack(`😔 ${r.nombre} está cerrado. ${horario.mensaje}`, 'info', 4000); return; }
+    if (carrito.length === 0) { showSnack('🛒 El carrito está vacío.', 'info'); return; }
+
+    const nombre = document.getElementById('input-nombre').value.trim();
+    if (!nombre) { mostrarErr('nombre','Escribe tu nombre'); document.getElementById('input-nombre').focus(); return; }
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]{2,40}$/.test(nombre)) { mostrarErr('nombre','Solo letras, mínimo 2 caracteres'); return; }
+
+    const tel = document.getElementById('input-tel').value.trim();
+    if (!tel) { mostrarErr('tel','Escribe tu teléfono'); document.getElementById('input-tel').focus(); return; }
+    if (!/^\d{10}$/.test(tel)) { mostrarErr('tel','Deben ser 10 dígitos'); document.getElementById('input-tel').focus(); return; }
+
+    if (!tipoEntrega) { showSnack('Elige si es a domicilio o recoger.', 'info'); return; }
+
+    const dir = document.getElementById('input-dir').value.trim();
+    if (tipoEntrega === 'domicilio' && !dir) { showSnack('Escribe tu dirección.', 'info'); return; }
+
+    if (!verificarAntispam()) return;
+
+    // Llenar modal de confirmación
+    const subtotal = carrito.reduce((s,i) => s + i.precio*i.cantidad, 0);
+    const envio    = tipoEntrega === 'domicilio' ? r.costoEnvio : 0;
+    const total    = subtotal + envio;
+    const itemsTxt = carrito.map(i => `${i.cantidad}x ${i.nombre}`).join(' · ');
+
+    document.getElementById('confirm-rows').innerHTML = `
+        <div class="confirm-row"><strong>Restaurante</strong><span>${esc(r.nombre)}</span></div>
+        <div class="confirm-row"><strong>Nombre</strong><span>${esc(nombre)}</span></div>
+        <div class="confirm-row"><strong>Teléfono</strong><span>${esc(tel)}</span></div>
+        <div class="confirm-row"><strong>Entrega</strong><span>${tipoEntrega==='domicilio'?'🛵 A domicilio':'🏬 Recoger'}</span></div>
+        ${tipoEntrega==='domicilio' ? `<div class="confirm-row"><strong>Dirección</strong><span>${esc(dir)}</span></div>` : ''}
+        <div class="confirm-row"><strong>Pedido</strong><span>${esc(itemsTxt)}</span></div>`;
+    document.getElementById('confirm-total').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('confirm-overlay').classList.add('show');
+}
+
+function cerrarConfirmacion() {
+    document.getElementById('confirm-overlay').classList.remove('show');
+}
+
+async function confirmarYEnviar() {
+    if (enviando) return;
+    enviando = true;
+    const btn = document.getElementById('btn-confirmar');
+    btn.classList.add('disabled');
+
+    try {
+        const r = restActivo;
+        const nombre = document.getElementById('input-nombre').value.trim();
+        const tel    = document.getElementById('input-tel').value.trim();
+        const dir    = document.getElementById('input-dir').value.trim();
+        const subtotal = carrito.reduce((s,i) => s + i.precio*i.cantidad, 0);
+        const envio    = tipoEntrega === 'domicilio' ? r.costoEnvio : 0;
+        const total    = subtotal + envio;
+
+        // Mensaje WhatsApp
+        const itemsWA = carrito.map(i => `  • ${i.cantidad}x ${i.nombre} — $${(i.precio*i.cantidad).toFixed(2)}`).join('%0A');
+        let msg = `¡Hola! Quiero hacer un pedido en *${r.nombre}* 🍽️%0A%0A`;
+        msg += `*Nombre:* ${nombre}%0A`;
+        msg += `*Teléfono:* ${tel}%0A`;
+        msg += tipoEntrega === 'domicilio'
+            ? `*Entrega:* A domicilio%0A*Dirección:* ${encodeURIComponent(dir)}%0A%0A`
+            : `*Entrega:* Recoger en tienda%0A%0A`;
+        msg += `*Pedido:*%0A${itemsWA}%0A%0A`;
+        msg += `*Subtotal:* $${subtotal.toFixed(2)}%0A`;
+        msg += `*Envío:* $${envio.toFixed(2)}%0A`;
+        msg += `*Total: $${total.toFixed(2)}*`;
+
+        // Guardar en Firebase
+        const pedido = {
+            nombre, telefono: tel,
+            entrega: tipoEntrega,
+            direccion: tipoEntrega === 'domicilio' ? dir : '',
+            restaurante: r.nombre,
+            restauranteId: r.id,
+            items: carrito.map(i => ({ id:i.id, nombre:i.nombre, cantidad:i.cantidad, precio:i.precio })),
+            subtotal, envio, total,
+            estado: 'pendiente'
+        };
+
+        let firebaseId = null;
+        if (typeof window._guardarFirebase === 'function') {
+            firebaseId = await window._guardarFirebase(pedido);
+        }
+        if (firebaseId) {
+            historial.unshift({ id: firebaseId, fecha: Date.now(), restaurante: r.nombre, items: pedido.items, total, estado: 'pendiente' });
+            localStorage.setItem('ne_historial', JSON.stringify(historial.slice(0, 30)));
+            suscribirPedido(firebaseId);
+        }
+
+        window.open(`https://wa.me/${r.whatsapp}?text=${msg}`, '_blank');
+        registrarEnvio();
+        cerrarConfirmacion();
+        cerrarCarrito();
+        carrito = [];
+        localStorage.removeItem('ne_carrito_' + r.id);  // limpiar carrito del restaurante
+        actualizarCarritoUI();
+        renderHistorial();
+        actualizarBadges();
+    } finally {
+        enviando = false;
+        btn.classList.remove('disabled');
+    }
+}
+
+// ════════════════════════════════════════════════════════════
+//  MIS PEDIDOS
+// ════════════════════════════════════════════════════════════
+function abrirMisPedidos() {
+    renderHistorial();
+    document.getElementById('mp-overlay').classList.add('open');
+    document.getElementById('mp-modal').classList.add('open');
+}
+function cerrarMisPedidos() {
+    document.getElementById('mp-overlay').classList.remove('open');
+    document.getElementById('mp-modal').classList.remove('open');
+}
+
+function etiquetaEstado(e) {
+    return { pendiente:'⏳ Pendiente', preparando:'🔥 Preparando', listo:'✅ Listo', mandadero_asignado:'🛵 Mandadero asignado', en_camino:'🛵 En camino', entregado:'✔ Entregado', cancelado:'✖ Cancelado' }[e] || e;
+}
+function pasoEstado(e) {
+    return { pendiente:1, preparando:2, listo:3, mandadero_asignado:4, en_camino:5, entregado:6 }[e] || 0;
+}
+
+function renderHistorial() {
+    const cont = document.getElementById('mp-list');
+    if (historial.length === 0) { cont.innerHTML = '<div class="mp-empty">Aún no has hecho ningún pedido 🛒</div>'; return; }
+    cont.innerHTML = historial.map(p => {
+        const fecha = new Date(p.fecha).toLocaleString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+        const itemsTxt = (p.items||[]).map(i => `${i.cantidad}x ${esc(i.nombre)}`).join(', ');
+        const paso = pasoEstado(p.estado);
+        const cancelado = p.estado === 'cancelado';
+        const barras = cancelado ? '' : `<div class="mp-progreso">
+            ${[1,2,3,4,5,6].map(n => `<span class="${paso>=n?'on':''}"></span>`).join('')}
+        </div>`;
+        return `
+        <div class="mp-card ${p.estado==='listo'?'es-listo':''}">
+            <div class="mp-card-top">
+                <div>
+                    <div class="mp-card-fecha">${fecha} · #${esc(String(p.id).slice(-5).toUpperCase())}</div>
+                    <div class="mp-card-rest">📍 ${esc(p.restaurante||'')}</div>
+                ${p.estado === 'preparando' && p.tiempoEstimadoMin
+                    ? `<div class="mp-tiempo-est">⏱️ Listo en ~${p.tiempoEstimadoMin === 25 ? '+25' : p.tiempoEstimadoMin} min</div>`
+                    : ''}
+                </div>
+                <span class="mp-estado mp-estado-${esc(p.estado||'pendiente')}">${etiquetaEstado(p.estado)}</span>
+            </div>
+            <div class="mp-card-items">${itemsTxt}</div>
+            <div class="mp-card-total">$${Number(p.total||0).toFixed(2)}</div>
+            ${barras}
+        </div>`;
+    }).join('');
+}
+
+function actualizarBadges() {
+    const activos = historial.filter(p => p.estado && p.estado !== 'entregado' && p.estado !== 'cancelado').length;
+    ['home-badge','menu-badge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (activos > 0) { el.style.display='flex'; el.textContent=activos; }
+        else el.style.display='none';
+    });
+}
+
+// ════════════════════════════════════════════════════════════
+//  AUDIO — sonido de aviso (Web Audio API, sin archivos externos)
+// ════════════════════════════════════════════════════════════
+function reproducirSonidoListo() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [[0, 880], [0.18, 1175]].forEach(([delay, freq]) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.0001, ctx.currentTime + delay);
+            gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + delay + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + 0.3);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(ctx.currentTime + delay);
+            osc.stop(ctx.currentTime + delay + 0.35);
+        });
+    } catch(e) { /* navegador sin interacción previa, se ignora */ }
+}
+
+function notificarPedidoListo(nombre) {
+    reproducirSonidoListo();
+    const seg = String(nombre || 'Tu pedido').slice(0, 60);
+    const el = document.getElementById('toast');
+    el.textContent = `🎉 ¡${seg}, tu pedido ya está listo!`;
+    el.classList.add('show');
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+function notificarCambioEstado(estado, nombre, tiempoMin) {
+    if (estado === 'listo') {
+        notificarPedidoListo(nombre);
+        return;
+    }
+    if (estado === 'preparando') {
+        const extra = tiempoMin ? ` Listo en ~${tiempoMin === 25 ? '+25' : tiempoMin} min.` : '';
+        showToast(`🔥 ¡Tu pedido está siendo preparado!${extra}`);
+        return;
+    }
+    const msgs = {
+        mandadero_asignado: '🛵 ¡Mandadero asignado! Pasará a recoger tu pedido.',
+        en_camino:          '🛵 ¡Tu pedido ya va en camino hacia ti!',
+        entregado:          '✔ ¡Pedido entregado! Buen provecho 😊',
+    };
+    if (msgs[estado]) showToast(msgs[estado]);
+}
+
+// ════════════════════════════════════════════════════════════
+//  FIREBASE — seguimiento en tiempo real
+// ════════════════════════════════════════════════════════════
+function suscribirPedido(id) {
+    // Se llama justo después de guardar un pedido nuevo.
+    // El módulo Firebase ya suscribe los pedidos históricos al arrancar;
+    // aquí cubrimos el caso del pedido recién creado en la sesión actual.
+    if (suscripciones[id] || !window._onSnapshot || !window._db) return;
+    const unsub = window._onSnapshot(window._db, id, (nuevoEstado, nombre, tiempoMin) => {
+        const idx = historial.findIndex(h => h.id === id);
+        if (idx < 0) return;
+        if (tiempoMin) historial[idx].tiempoEstimadoMin = tiempoMin;
+        if (historial[idx].estado === nuevoEstado) return;
+        historial[idx].estado = nuevoEstado;
+        localStorage.setItem('ne_historial', JSON.stringify(historial.slice(0,30)));
+        renderHistorial();
+        actualizarBadges();
+        notificarCambioEstado(nuevoEstado, nombre || historial[idx].nombre, tiempoMin);
+        if (nuevoEstado === 'entregado' || nuevoEstado === 'cancelado') {
+            unsub(); delete suscripciones[id];
+        }
+    });
+    if (unsub) suscripciones[id] = unsub;
+}
+
+// ════════════════════════════════════════════════════════════
+//  SPLASH
+// ════════════════════════════════════════════════════════════
+(function() {
+    const splash = document.getElementById('splash');
+    const MIN = 2000;
+    const start = Date.now();
+
+    function ajustar() {
+        const alto = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+        splash.style.height = alto + 'px';
+    }
+    ajustar();
+    window.addEventListener('resize', ajustar);
+    window.addEventListener('orientationchange', ajustar);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', ajustar);
+
+    function ocultar() {
+        const rest = Math.max(0, MIN - (Date.now() - start));
+        setTimeout(() => {
+            splash.classList.add('oculto');
+            // Limpiar listeners — ya no se necesitan
+            window.removeEventListener('resize', ajustar);
+            window.removeEventListener('orientationchange', ajustar);
+            if (window.visualViewport) window.visualViewport.removeEventListener('resize', ajustar);
+        }, rest);
+    }
+    document.fonts?.ready ? document.fonts.ready.then(ocultar) : ocultar();
+})();
+
+// ════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+    renderHome();
+    renderHistorial();
+    actualizarBadges();
+});
 </script>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, onSnapshot, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // ⚠️ REEMPLAZA CON TU CONFIGURACIÓN DE FIREBASE (debe ser LA MISMA que en pedidos.html)
-       const firebaseConfig = {
-  apiKey: "AIzaSyD6J9IiySIkqYOPISKtefMd0mGKiQRlu4g",
-  authDomain: "cafe-fresa.firebaseapp.com",
-  projectId: "cafe-fresa",
-  storageBucket: "cafe-fresa.firebasestorage.app",
-  messagingSenderId: "230005643477",
-  appId: "1:230005643477:web:ef80758814e259c8cf6a5c"
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+window._db = db;
+window._doc = doc;
+window._onSnapshotFn = onSnapshot;
+
+// Implementación real de _onSnapshot (necesita doc + onSnapshot del scope del módulo)
+window._onSnapshot = function(db, id, callback) {
+    const unsub = onSnapshot(doc(db, 'pedidos', id), snap => {
+        if (!snap.exists()) return;
+        const data = snap.data();
+        callback(data.estado, data.nombre, data.tiempoEstimadoMin || null);
+    });
+    return unsub;
 };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.guardarPedidoFirebase = async function(pedido) {
-            try {
-                const ref = await addDoc(collection(db, "pedidos"), {
-                    ...pedido,
-                    timestamp: serverTimestamp(),
-                    estado: "pendiente"
-                });
-                return ref.id;
-            } catch (e) {
-                console.error("Error al guardar pedido en Firebase:", e);
-                return null;
-            }
-        };
-
-        // Escucha en tiempo real los cambios de estado de un pedido (lo usa el seguimiento / historial)
-        window.suscribirPedidoFirebase = function(id, callback) {
-            try {
-                return onSnapshot(doc(db, "pedidos", id), (snap) => {
-                    if (snap.exists()) callback(snap.data());
-                });
-            } catch (e) {
-                console.error("Error al suscribirse al pedido:", e);
-                return null;
-            }
-        };
-    </script>
-
-    <script>
-        // 0. UTILIDAD DE SEGURIDAD — escapa caracteres HTML especiales antes de insertar
-        //    texto de usuario en innerHTML.  Úsala en TODOS los lugares donde datos
-        //    del cliente (nombre, dirección, ítems…) se metan con innerHTML.
-        function esc(str) {
-            if (str === null || str === undefined) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        // 1. CONFIGURACIÓN
-        const NOMBRE_NEGOCIO = "Café Aroma"; // usado por mandaderos.html para "Recoger en: X"
-        const numeroWhatsApp = "528714024914"; // ⚠️ PON AQUÍ TU NÚMERO (código de país + número, sin espacios ni +)
-        const costoEnvioFijo = 25.00; // Costo de envío
-
-        // ════════════════════════════════════════
-        // ANTI-SPAM — límite de pedidos por navegador
-        // ════════════════════════════════════════
-        // Máximo de pedidos que se pueden enviar desde el mismo navegador
-        // dentro de la ventana de tiempo definida abajo.
-        const ANTISPAM_MAX_PEDIDOS  = 3;          // pedidos permitidos…
-        const ANTISPAM_VENTANA_MIN  = 60;         // …en esta cantidad de minutos
-
-        // ════════════════════════════════════════
-        // HORARIO DE ATENCIÓN
-        // ════════════════════════════════════════
-        // Pon la hora de apertura y cierre de cada día en formato 24h "HH:MM".
-        // Si un día está cerrado todo el día, deja abre y cierra como null.
-        // 0 = Domingo, 1 = Lunes, 2 = Martes, 3 = Miércoles, 4 = Jueves, 5 = Viernes, 6 = Sábado
-        const HORARIO = {
-            0: { abre: "10:00",    cierra: "20:00"  }, // Domingo cerrado (cambia a horas si abres)
-            1: { abre: "08:00", cierra: "20:00" },
-            2: { abre: "08:00", cierra: "20:00" },
-            3: { abre: "00:00", cierra: "20:00" },
-            4: { abre: "08:00", cierra: "20:00" },
-            5: { abre: "08:00", cierra: "21:00" },
-            6: { abre: "09:00", cierra: "21:00" },
-        };
-
-        function estadoHorario() {
-            const ahora = new Date();
-            const dia = ahora.getDay();
-            const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
-            const hoy = HORARIO[dia];
-
-            if (!hoy || !hoy.abre || !hoy.cierra) {
-                return { abierto: false, mensaje: `Hoy estamos cerrados.${proximaAperturaTexto(dia)}` };
-            }
-
-            const [hA, mA] = hoy.abre.split(':').map(Number);
-            const [hC, mC] = hoy.cierra.split(':').map(Number);
-            const minutosApertura = hA * 60 + mA;
-            const minutosCierre = hC * 60 + mC;
-
-            if (horaActual < minutosApertura) {
-                return { abierto: false, mensaje: `Aún no abrimos. Abrimos hoy a las ${hoy.abre}.` };
-            }
-            if (horaActual >= minutosCierre) {
-                return { abierto: false, mensaje: `Ya cerramos por hoy.${proximaAperturaTexto(dia)}` };
-            }
-            return { abierto: true, mensaje: `Abierto ahora · cerramos a las ${hoy.cierra}` };
-        }
-
-        function proximaAperturaTexto(diaActual) {
-            const nombresDias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-            for (let i = 1; i <= 7; i++) {
-                const siguiente = (diaActual + i) % 7;
-                const horario = HORARIO[siguiente];
-                if (horario && horario.abre) {
-                    const cuando = i === 1 ? 'mañana' : `el ${nombresDias[siguiente]}`;
-                    return ` Abrimos ${cuando} a las ${horario.abre}.`;
-                }
-            }
-            return '';
-        }
-
-        // 2. PRODUCTOS — array estático, se edita directo aquí en el HTML
-        // Cuando tengas el menú real del negocio, solo reemplaza/agrega objetos en este arreglo
-        // siguiendo el mismo formato. Campos:
-        //   id        -> número único
-        //   emoji     -> usado si NO pones "imagen" (tarjeta horizontal clásica)
-        //   imagen    -> ruta a una foto del producto (si la pones, se usa tarjeta con foto grande)
-        //   nombre    -> nombre del producto
-        //   precio    -> número (sin signo de $)
-        //   categoria -> agrupa los productos en secciones del menú (ej: 'cafe', 'chocolate', 'fruta')
-        //   tag       -> clase opcional para colorear el badge de categoría (ver .tag-* en el CSS)
-        //   tagLabel  -> texto que se muestra en el badge (si no se pone, se usa el nombre de la categoría)
-        //   desc      -> descripción corta del producto
-        const productos = [
-            { id: 1, emoji: '☕', nombre: 'Americano', precio: 35, categoria: 'cafe', tag: 'tag-cafe', tagLabel: 'Café', desc: 'Café negro de grano 100% arábica, suave y aromático.' },
-            { id: 2, emoji: '🥛', nombre: 'Latte Vainilla', precio: 48, categoria: 'cafe', tag: 'tag-cafe', tagLabel: 'Café', desc: 'Espresso con leche cremosa y un toque de vainilla natural.' },
-            { id: 3, imagen: 'Imagenes/capuchino.jpeg', nombre: 'Capuchino Clásico', precio: 45, categoria: 'cafe', tag: 'tag-cafe', tagLabel: 'Café', desc: 'Espresso, leche vaporizada y espuma tupida con canela.' },
-            { id: 20, emoji: '🍫', nombre: 'Chocolatísimo Magnum', precio: 100, categoria: 'chocolate', tag: 'tag-chocolate', tagLabel: 'Chocolatísimo', desc: 'Especial Magnum – Explosión de sabor a chocolate. ¡El más pedido!', imagen: 'Imagenes/choco-magnum.jpeg' },
-            { id: 21, emoji: '🍫', nombre: 'Chocolate Caliente', precio: 42, categoria: 'chocolate', tag: 'tag-chocolate', tagLabel: 'Chocolatísimo', desc: 'Chocolate cremoso preparado con leche entera, bien espumoso.' },
-            { id: 30, emoji: '🥐', nombre: 'Croissant de Mantequilla', precio: 32, categoria: 'panaderia', tag: 'tag-clasico', tagLabel: 'Horneado', desc: 'Hojaldrado, recién horneado todas las mañanas.' },
-            { id: 31, imagen: 'Imagenes/pastel-zanahoria.jpeg', nombre: 'Pastel de Zanahoria', precio: 55, categoria: 'panaderia', tag: 'tag-clasico', tagLabel: 'Horneado', desc: 'Rebanada de pastel casero con betún de queso crema.' },
-            { id: 40, emoji: '🍓', nombre: 'Frappé de Fresa', precio: 50, categoria: 'fruta', tag: 'tag-fruta', tagLabel: 'Fresco', desc: 'Fresa natural licuada con hielo y un toque de crema.' },
-            { id: 41, emoji: '🍋', nombre: 'Limonada Mineral', precio: 30, categoria: 'fruta', tag: 'tag-fruta', tagLabel: 'Fresco', desc: 'Limón recién exprimido con agua mineral bien fría.' },
-        ];
-
-        let carrito = JSON.parse(localStorage.getItem('cafe_carrito') || '[]');
-        let categoriaActiva = 'Todos';
-        let tipoEntrega = localStorage.getItem('cafe_entrega') || null; // 'domicilio' | 'recoger'
-
-        // ════════════════════════════════════════
-        // SEGUIMIENTO DE PEDIDOS + HISTORIAL (localStorage)
-        // ════════════════════════════════════════
-        let historialPedidos = JSON.parse(localStorage.getItem('cafe_historial') || '[]');
-        const suscripcionesActivas = {}; // id -> función para cancelar el listener de Firestore
-
-        function guardarHistorial() {
-            localStorage.setItem('cafe_historial', JSON.stringify(historialPedidos));
-        }
-
-        function agregarPedidoAlHistorial(firebaseId, pedido) {
-            historialPedidos.unshift({
-                id: firebaseId,
-                nombre: pedido.nombre,
-                items: pedido.items,
-                total: pedido.total,
-                entrega: pedido.entrega,
-                estado: 'pendiente',
-                fecha: Date.now()
-            });
-            // Conserva como máximo los últimos 20 pedidos en el historial
-            historialPedidos = historialPedidos.slice(0, 20);
-            guardarHistorial();
-            suscribirSeguimiento(firebaseId);
-            renderHistorial();
-        }
-
-        // Escucha cambios de estado en vivo para un pedido del historial
-        function suscribirSeguimiento(id) {
-            if (suscripcionesActivas[id]) return; // ya suscrito
-            if (typeof window.suscribirPedidoFirebase !== 'function') return;
-
-            const unsub = window.suscribirPedidoFirebase(id, (data) => {
-                const pedidoLocal = historialPedidos.find(p => p.id === id);
-                if (!pedidoLocal) return;
-
-                const estadoAnterior = pedidoLocal.estado;
-                const estadoNuevo = data.estado || 'pendiente';
-
-                // Actualizar tiempo estimado si lo manda el restaurante
-                if (data.tiempoEstimadoMin) {
-                    pedidoLocal.tiempoEstimadoMin = data.tiempoEstimadoMin;
-                }
-
-                if (estadoAnterior !== estadoNuevo) {
-                    pedidoLocal.estado = estadoNuevo;
-                    guardarHistorial();
-                    renderHistorial();
-
-                    if (estadoNuevo === 'preparando') {
-                        const mins = data.tiempoEstimadoMin;
-                        const textoTiempo = mins ? ` Estará listo en ~${mins === 25 ? '+25' : mins} min.` : '';
-                        mostrarToastCliente(`🔥 ¡Tu pedido está siendo preparado!${textoTiempo}`);
-                    } else if (estadoNuevo === 'listo') {
-                        notificarPedidoListo(pedidoLocal.nombre);
-                    } else if (estadoNuevo === 'mandadero_asignado') {
-                        mostrarToastCliente('🛵 ¡Mandadero asignado! Pasará al restaurante a recoger tu pedido.');
-                    } else if (estadoNuevo === 'en_camino') {
-                        mostrarToastCliente('🛵 ¡Tu pedido ya va en camino hacia ti!');
-                    } else if (estadoNuevo === 'entregado') {
-                        mostrarToastCliente('✅ ¡Pedido entregado! Buen provecho 😊');
-                    }
-                }
-
-                // Cuando el pedido ya terminó su ciclo, dejamos de escuchar
-                if (estadoNuevo === 'entregado' || estadoNuevo === 'cancelado') {
-                    if (suscripcionesActivas[id]) {
-                        suscripcionesActivas[id]();
-                        delete suscripcionesActivas[id];
-                    }
-                }
-            });
-
-            if (unsub) suscripcionesActivas[id] = unsub;
-        }
-
-        function resuscribirPedidosActivos() {
-            historialPedidos.forEach(p => {
-                if (p.estado !== 'entregado' && p.estado !== 'cancelado') {
-                    suscribirSeguimiento(p.id);
-                }
-            });
-        }
-
-        function etiquetaEstado(e) {
-            return {
-                pendiente:          '⏳ Pendiente',
-                preparando:         '🔥 Preparando',
-                listo:              '✅ Listo',
-                mandadero_asignado: '🛵 Mandadero asignado',
-                en_camino:          '🛵 En camino',
-                entregado:          '✔ Entregado',
-                cancelado:          '✖ Cancelado'
-            }[e] || e;
-        }
-
-        // 6 pasos visibles para el cliente:
-        // 1 pendiente → 2 preparando → 3 listo → 4 mandadero_asignado → 5 en_camino → 6 entregado
-        function pasoEstado(e) {
-            return { pendiente: 1, preparando: 2, listo: 3, mandadero_asignado: 4, en_camino: 5, entregado: 6 }[e] || 0;
-        }
-
-        function abrirMisPedidos() {
-            document.getElementById('mp-overlay').classList.add('open');
-            document.getElementById('mp-modal').classList.add('open');
-            renderHistorial();
-        }
-        function cerrarMisPedidos() {
-            document.getElementById('mp-overlay').classList.remove('open');
-            document.getElementById('mp-modal').classList.remove('open');
-        }
-        window.abrirMisPedidos  = abrirMisPedidos;
-        window.cerrarMisPedidos = cerrarMisPedidos;
-
-        function renderHistorial() {
-            const cont = document.getElementById('mp-list');
-
-            if (historialPedidos.length === 0) {
-                cont.innerHTML = '<div class="mp-empty">Aún no has hecho ningún pedido.</div>';
-            } else {
-                cont.innerHTML = historialPedidos.map(p => {
-                    const fecha = new Date(p.fecha).toLocaleString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                    // esc() en nombres de ítems — vienen de Firestore/localStorage y son datos del cliente
-                    const itemsTexto = (p.items || []).map(it => `${Number(it.cantidad)}x ${esc(it.nombre)}`).join(', ');
-                    const estado = esc(p.estado || 'pendiente'); // solo se usa como clase CSS segura
-                    const paso = pasoEstado(p.estado);
-                    const cancelado = p.estado === 'cancelado';
-                    const barras = cancelado ? '' : `
-                        <div class="mp-progreso">
-                            <span class="${paso >= 1 ? 'on' : ''}"></span>
-                            <span class="${paso >= 2 ? 'on' : ''}"></span>
-                            <span class="${paso >= 3 ? 'on' : ''}"></span>
-                            <span class="${paso >= 4 ? 'on' : ''}"></span>
-                            <span class="${paso >= 5 ? 'on' : ''}"></span>
-                            <span class="${paso >= 6 ? 'on' : ''}"></span>
-                        </div>`;
-                    // p.id es un ID de Firestore (alfanumérico), esc() por consistencia
-                    return `
-                        <div class="mp-card ${p.estado === 'listo' ? 'es-listo' : ''}">
-                            <div class="mp-card-top">
-                                <div>
-                                    <div class="mp-card-fecha">${fecha} · #${esc(p.id).slice(-5).toUpperCase()}</div>
-                                </div>
-                                <span class="mp-estado mp-estado-${estado}">${etiquetaEstado(p.estado)}</span>
-                            </div>
-                            <div class="mp-card-items">${itemsTexto}</div>
-                            ${p.estado === 'preparando' && p.tiempoEstimadoMin
-                                ? `<div class="mp-tiempo-est">⏱️ Listo en ~${p.tiempoEstimadoMin === 25 ? '+25' : p.tiempoEstimadoMin} min</div>`
-                                : ''}
-                            <div class="mp-card-total">$${Number(p.total || 0).toFixed(2)}</div>
-                            ${barras}
-                        </div>`;
-                }).join('');
-            }
-
-            // Actualiza la insignia con la cantidad de pedidos activos
-            const activos = historialPedidos.filter(p => p.estado !== 'entregado' && p.estado !== 'cancelado').length;
-            const badge = document.getElementById('mis-pedidos-badge');
-            if (activos > 0) {
-                badge.style.display = 'flex';
-                badge.textContent = activos;
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        // ── Sonido de aviso (sin archivos externos, generado con Web Audio API) ──
-        function reproducirSonidoListo() {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                [0, 0.18].forEach((delay, i) => {
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = 'sine';
-                    osc.frequency.value = i === 0 ? 880 : 1175;
-                    gain.gain.setValueAtTime(0.0001, ctx.currentTime + delay);
-                    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + delay + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + 0.3);
-                    osc.connect(gain).connect(ctx.destination);
-                    osc.start(ctx.currentTime + delay);
-                    osc.stop(ctx.currentTime + delay + 0.32);
-                });
-            } catch (e) { /* el navegador puede bloquear audio sin interacción previa, no pasa nada */ }
-        }
-
-        function notificarPedidoListo(nombre) {
-            reproducirSonidoListo();
-            const toast = document.getElementById('toast-listo');
-            // textContent es seguro por sí solo (no interpreta HTML), pero
-            // limitamos la longitud por si acaso viene un nombre muy largo.
-            const nombreSeguro = String(nombre || 'Tu pedido').slice(0, 60);
-            document.getElementById('toast-listo-texto').textContent = `¡${nombreSeguro}, ya está listo! ☕`;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 4500);
-        }
-
-        function mostrarToastCliente(texto) {
-            const toast = document.getElementById('toast-listo');
-            document.getElementById('toast-listo-texto').textContent = texto;
-            toast.classList.add('show');
-            clearTimeout(window._toastClienteTimeout);
-            window._toastClienteTimeout = setTimeout(() => toast.classList.remove('show'), 4500);
-        }
-
-        // 3. RENDERIZAR MENÚ
-        function renderizarMenu() {
-            const contenedor = document.getElementById('menu-container');
-
-            if (productos.length === 0) {
-                contenedor.innerHTML = '<p style="text-align:center; color:#F4EBE1; padding:40px; opacity:.7;">Aún no hay productos cargados.</p>';
-                return;
-            }
-
-            contenedor.innerHTML = '';
-
-            // Extraer las categorías únicas (en el orden en que aparecen)
-            const categorias = [...new Set(productos.map(p => p.categoria))];
-
-            categorias.forEach(cat => {
-                if (categoriaActiva !== 'Todos' && categoriaActiva !== cat) return;
-
-                contenedor.innerHTML += `<h2 class="section-title" style="margin-top: 32px;">${cat}</h2>`;
-
-                let gridHTML = '<div class="products-grid">';
-                const prodsCat = productos.filter(p => p.categoria === cat);
-
-                prodsCat.forEach(prod => {
-                    const descripcion = prod.desc || prod.descripcion || '';
-                    const precio = Number(prod.precio) || 0;
-                    const tieneImagen = !!prod.imagen;
-
-                    gridHTML += `
-                        <div class="product-card">
-                            <div class="product-info">
-                                <h3 class="product-name">${prod.nombre}</h3>
-                                <p class="product-desc">${descripcion}</p>
-                                <div class="product-price">$${precio.toFixed(2)}</div>
-                            </div>
-                            <div class="product-image-container">
-                                <div class="product-image-inner">
-                                    ${tieneImagen ? `<img src="${prod.imagen}" alt="${prod.nombre}">` : (prod.emoji || '🍽️')}
-                                </div>
-                                <div class="add-btn" onclick="agregarAlCarrito('${prod.id}')">+</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                gridHTML += '</div>';
-                contenedor.innerHTML += gridHTML;
-            });
-        }
-
-        // 3b. CATEGORÍAS DINÁMICAS (se generan según los productos cargados)
-        function inicializarCategoriasDinamicas() {
-            const cont = document.getElementById('categories-container');
-            const categorias = [...new Set(productos.map(p => p.categoria))];
-
-            // Si la categoría activa ya no existe (se borró), regresa a "Todos"
-            if (categoriaActiva !== 'Todos' && !categorias.includes(categoriaActiva)) {
-                categoriaActiva = 'Todos';
-            }
-
-            let html = `<div class="category-chip${categoriaActiva === 'Todos' ? ' active' : ''}" data-cat="Todos">Todos</div>`;
-            categorias.forEach(cat => {
-                html += `<div class="category-chip${categoriaActiva === cat ? ' active' : ''}" data-cat="${cat}">${cat}</div>`;
-            });
-            cont.innerHTML = html;
-
-            cont.querySelectorAll('.category-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    cont.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    categoriaActiva = chip.dataset.cat;
-                    renderizarMenu();
-                });
-            });
-        }
-
-        // 4. LÓGICA DEL CARRITO
-        function agregarAlCarrito(id) {
-            const producto = productos.find(p => p.id == id);
-            const itemEnCarrito = carrito.find(item => item.id == id);
-            
-            if (itemEnCarrito) {
-                itemEnCarrito.cantidad++;
-            } else {
-                carrito.push({ ...producto, cantidad: 1 });
-            }
-            guardarEstado();
-            actualizarInterfazCarrito();
-        }
-
-        function disminuirCantidad(id) {
-            const itemIndex = carrito.findIndex(item => item.id == id);
-            if (itemIndex > -1) {
-                carrito[itemIndex].cantidad--;
-                if (carrito[itemIndex].cantidad === 0) {
-                    carrito.splice(itemIndex, 1); // Lo elimina si llega a 0
-                }
-            }
-            guardarEstado();
-            actualizarInterfazCarrito();
-        }
-
-        // 4b. PERSISTENCIA (carrito, nombre y entrega sobreviven a un refresh)
-        function guardarEstado() {
-            localStorage.setItem('cafe_carrito', JSON.stringify(carrito));
-            localStorage.setItem('cafe_nombre', document.getElementById('cliente-nombre').value);
-            localStorage.setItem('cafe_direccion', document.getElementById('direccion-campo').value);
-            if (tipoEntrega) localStorage.setItem('cafe_entrega', tipoEntrega);
-        }
-
-        // 4c. SELECCIÓN DE TIPO DE ENTREGA
-        function seleccionarEntrega(tipo) {
-            tipoEntrega = tipo;
-            document.getElementById('entrega-domicilio').classList.toggle('active', tipo === 'domicilio');
-            document.getElementById('entrega-recoger').classList.toggle('active', tipo === 'recoger');
-            document.getElementById('direccion-wrapper').classList.toggle('show', tipo === 'domicilio');
-            guardarEstado();
-            actualizarInterfazCarrito();
-        }
-
-        // 4d. GEOLOCALIZACIÓN (rellena la dirección con coordenadas si el navegador lo permite)
-        function solicitarUbicacion() {
-            if (!navigator.geolocation) {
-                showSnack('Tu navegador no soporta geolocalización. Escribe tu dirección manualmente.', 'info');
-                return;
-            }
-            const boton = document.getElementById('btn-ubicacion');
-            boton.innerText = '📍 Obteniendo ubicación...';
-            boton.disabled = true;
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    const { latitude, longitude } = pos.coords;
-                    const campo = document.getElementById('direccion-campo');
-                    const link = `https://maps.google.com/?q=${latitude},${longitude}`;
-
-                    // Si el cliente ya picó este botón antes, quita esa línea de GPS vieja
-                    // en vez de acumularla, para no pegar varios links uno tras otro.
-                    const base = campo.value.replace(/\n?📍 Ubicación GPS:\s*\S+/g, '').trim();
-
-                    // Línea claramente marcada y separada de lo que el cliente escribió a mano,
-                    // así nunca se ve como texto pegado/confuso en los paneles del restaurante.
-                    campo.value = base
-                        ? `${base}\n📍 Ubicación GPS: ${link}`
-                        : `📍 Ubicación GPS: ${link}`;
-
-                    boton.innerText = '📍 Usar mi ubicación actual';
-                    boton.disabled = false;
-                    guardarEstado();
-                },
-                () => {
-                    showSnack('No se pudo obtener tu ubicación. Escribe tu dirección manualmente.', 'info');
-                    boton.innerText = '📍 Usar mi ubicación actual';
-                    boton.disabled = false;
-                }
-            );
-        }
-
-        // 5. ACTUALIZAR INTERFAZ (Textos y sumas)
-        function actualizarInterfazCarrito() {
-            let totalItems = 0;
-            let subtotal = 0;
-            
-            carrito.forEach(item => {
-                totalItems += item.cantidad;
-                subtotal += (item.precio * item.cantidad);
-            });
-
-            const envio = (subtotal > 0 && tipoEntrega === 'domicilio') ? costoEnvioFijo : 0;
-            const total = subtotal + envio;
-
-            // Barra Flotante
-            const stickyCart = document.getElementById('sticky-cart');
-            if (totalItems > 0) {
-                stickyCart.style.display = 'flex';
-                document.getElementById('cart-count').innerText = totalItems;
-                document.getElementById('cart-total-bar').innerText = `$${subtotal.toFixed(2)}`;
-            } else {
-                stickyCart.style.display = 'none';
-                cerrarCarrito(); // Cierra modal automático y desbloquea scroll
-            }
-
-            // Modal: Lista de Productos
-            const orderContainer = document.getElementById('order-items-container');
-            orderContainer.innerHTML = '';
-            
-            carrito.forEach(item => {
-                orderContainer.innerHTML += `
-                    <div class="order-item">
-                        <div style="display:flex; align-items:center;">
-                            <span class="item-qty">${Number(item.cantidad)}x</span>
-                            <span class="item-name">${esc(item.nombre)}</span>
-                        </div>
-                        <div style="display:flex; align-items:center;">
-                            <span class="item-price">$${(item.precio * item.cantidad).toFixed(2)}</span>
-                            <div class="qty-controls">
-                                <button class="qty-btn" onclick="disminuirCantidad('${Number(item.id)}')">-</button>
-                                <button class="qty-btn" onclick="agregarAlCarrito('${Number(item.id)}')">+</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // Modal: Recibo Financiero
-            const envioLabel = document.getElementById('receipt-envio-label');
-            envioLabel.innerText = tipoEntrega === 'recoger' ? 'Costo de envío (recoger en tienda)' : 'Costo de envío';
-            document.getElementById('receipt-subtotal').innerText = `$${subtotal.toFixed(2)}`;
-            document.getElementById('receipt-envio').innerText = `$${envio.toFixed(2)}`;
-            document.getElementById('receipt-total').innerText = `$${total.toFixed(2)}`;
-        }
-
-        // ════════════════════════════════════════
-        // ANTI-SPAM — helpers
-        // ════════════════════════════════════════
-        function registrarEnvio() {
-            const clave = 'cafe_envios';
-            const ahora = Date.now();
-            const lista = JSON.parse(localStorage.getItem(clave) || '[]');
-            // Agrega el timestamp actual y descarta los que ya vencieron
-            lista.push(ahora);
-            const ventanaMs = ANTISPAM_VENTANA_MIN * 60 * 1000;
-            const activos = lista.filter(t => ahora - t < ventanaMs);
-            localStorage.setItem(clave, JSON.stringify(activos));
-        }
-
-        function verificarAntispam() {
-            const clave = 'cafe_envios';
-            const ahora = Date.now();
-            const ventanaMs = ANTISPAM_VENTANA_MIN * 60 * 1000;
-            const lista = JSON.parse(localStorage.getItem(clave) || '[]');
-            const recientes = lista.filter(t => ahora - t < ventanaMs);
-            if (recientes.length >= ANTISPAM_MAX_PEDIDOS) {
-                // Calcula cuántos minutos faltan para que el más antiguo caduque
-                const masAntiguo = Math.min(...recientes);
-                const minRestantes = Math.ceil((masAntiguo + ventanaMs - ahora) / 60000);
-                showSnack(`⏳ Espera ${minRestantes} minuto${minRestantes !== 1 ? 's' : ''} antes de hacer otro pedido.`, 'error', 4500);
-                return false;
-            }
-            return true;
-        }
-
-        // ── Helpers de validación de campos ──
-        function mostrarErrorCampo(campo, msg) {
-            const input = document.getElementById('cliente-' + campo);
-            const errDiv = document.getElementById('error-' + campo);
-            if (input) input.classList.add('campo-invalido');
-            if (errDiv) errDiv.textContent = msg;
-        }
-        function limpiarErrorCampo(campo) {
-            const input = document.getElementById('cliente-' + campo);
-            const errDiv = document.getElementById('error-' + campo);
-            if (input) input.classList.remove('campo-invalido');
-            if (errDiv) errDiv.textContent = '';
-        }
-
-        // Validación en tiempo real — nombre: solo letras y espacios
-        document.addEventListener('DOMContentLoaded', () => {
-            const inputNombre = document.getElementById('cliente-nombre');
-            const inputTel    = document.getElementById('cliente-telefono');
-
-            if (inputNombre) {
-                inputNombre.addEventListener('input', () => {
-                    // Elimina caracteres no permitidos al vuelo
-                    inputNombre.value = inputNombre.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]/g, '');
-                    limpiarErrorCampo('nombre');
-                });
-            }
-
-            if (inputTel) {
-                inputTel.addEventListener('input', () => {
-                    // Solo dígitos, máximo 10
-                    inputTel.value = inputTel.value.replace(/\D/g, '').slice(0, 10);
-                    limpiarErrorCampo('telefono');
-                });
-                // Guardar en localStorage para no tener que reescribir
-                inputTel.addEventListener('change', () => {
-                    if (/^\d{10}$/.test(inputTel.value.trim())) {
-                        localStorage.setItem('cafe_telefono', inputTel.value.trim());
-                    }
-                });
-            }
-        });
-
-        // 6. CONFIRMACIÓN FINAL → ENVIAR A WHATSAPP + GUARDAR EN FIREBASE
-        let enviandoPedido = false;
-
-        // Valida todo y, si está bien, muestra el resumen en el modal de confirmación.
-        // No envía nada todavía — eso solo pasa si el cliente confirma ahí.
-        function abrirConfirmacionPedido() {
-            if (enviandoPedido) return;
-
-            const horario = estadoHorario();
-            if (!horario.abierto) {
-                showSnack(`😔 Estamos cerrados. ${horario.mensaje}`, 'info', 4000);
-                return;
-            }
-
-            if (carrito.length === 0) {
-                showSnack('🛒 El carrito está vacío. Agrega productos primero.', 'info');
-                return;
-            }
-
-            const nombre = document.getElementById('cliente-nombre').value.trim();
-            if (!nombre) {
-                mostrarErrorCampo('nombre', 'Escribe tu nombre');
-                document.getElementById('cliente-nombre').focus();
-                return;
-            }
-            if (!/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]{2,40}$/.test(nombre)) {
-                mostrarErrorCampo('nombre', 'Solo letras y espacios, mínimo 2 caracteres');
-                document.getElementById('cliente-nombre').focus();
-                return;
-            }
-
-            const telefono = document.getElementById('cliente-telefono').value.trim();
-            if (!telefono) {
-                mostrarErrorCampo('telefono', 'Escribe tu número de teléfono');
-                document.getElementById('cliente-telefono').focus();
-                return;
-            }
-            if (!/^\d{10}$/.test(telefono)) {
-                mostrarErrorCampo('telefono', 'Deben ser exactamente 10 dígitos');
-                document.getElementById('cliente-telefono').focus();
-                return;
-            }
-
-            if (!tipoEntrega) {
-                showSnack('🛵 Elige si tu pedido es a domicilio o para recoger.', 'error');
-                return;
-            }
-
-            const direccion = document.getElementById('direccion-campo').value.trim();
-            if (tipoEntrega === 'domicilio' && !direccion) {
-                showSnack('📍 Escribe tu dirección para poder entregarte el pedido.', 'error');
-                document.getElementById('direccion-campo').focus();
-                return;
-            }
-
-            // Anti-spam: bloquear si se superó el límite de pedidos recientes
-            if (!verificarAntispam()) return;
-
-            // ── Resumen en el modal de confirmación ──
-            const subtotal = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-            const envio = tipoEntrega === 'domicilio' ? costoEnvioFijo : 0;
-            const total = subtotal + envio;
-
-            document.getElementById('confirm-nombre').textContent = nombre;
-            document.getElementById('confirm-telefono').textContent = telefono;
-            document.getElementById('confirm-entrega').textContent =
-                tipoEntrega === 'domicilio' ? '🛵 A domicilio' : '🏬 Recoger en tienda';
-
-            const direccionRow = document.getElementById('confirm-direccion-row');
-            if (tipoEntrega === 'domicilio') {
-                direccionRow.style.display = 'flex';
-                document.getElementById('confirm-direccion').textContent = direccion;
-            } else {
-                direccionRow.style.display = 'none';
-            }
-            document.getElementById('confirm-total').textContent = `$${total.toFixed(2)}`;
-
-            document.getElementById('confirm-overlay').classList.add('open');
-        }
-
-        function cerrarConfirmacion() {
-            document.getElementById('confirm-overlay').classList.remove('open');
-        }
-
-        // Se ejecuta solo cuando el cliente pica "Sí, enviar pedido" dentro del modal de confirmación.
-        async function confirmarYEnviarPedido() {
-            if (enviandoPedido) return;
-
-            const nombre = document.getElementById('cliente-nombre').value.trim();
-            const direccion = document.getElementById('direccion-campo').value.trim();
-
-            enviandoPedido = true;
-            const btn = document.getElementById('btn-enviar-pedido');
-            const btnTexto = document.getElementById('btn-enviar-pedido-texto');
-            const btnConfirm = document.getElementById('confirm-btn-enviar');
-            const btnConfirmTexto = document.getElementById('confirm-btn-enviar-texto');
-            btn.classList.add('disabled');
-            btnTexto.textContent = 'Enviando pedido…';
-            btnConfirm.classList.add('disabled');
-            btnConfirmTexto.textContent = 'Enviando…';
-
-            try {
-
-            const telefono = document.getElementById('cliente-telefono').value.trim();
-            let texto = `¡Hola! Quiero hacer un pedido en *${NOMBRE_NEGOCIO}* ☕:%0A%0A`;
-            texto += `*Nombre:* ${nombre}%0A`;
-            texto += `*Teléfono:* ${telefono}%0A`;
-            texto += tipoEntrega === 'domicilio'
-                ? `*Entrega:* A domicilio%0A*Dirección:* ${direccion}%0A%0A`
-                : `*Entrega:* Recoger en tienda%0A%0A`;
-            
-            carrito.forEach(item => {
-                texto += `▪ ${item.cantidad}x ${item.nombre} - $${(item.precio * item.cantidad).toFixed(2)}%0A`;
-            });
-            
-            let subtotal = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
-            let envio = tipoEntrega === 'domicilio' ? costoEnvioFijo : 0;
-            let total = subtotal + envio;
-
-            texto += `%0A*Subtotal:* $${subtotal.toFixed(2)}`;
-            texto += `%0A*Envío:* $${envio.toFixed(2)}`;
-            texto += `%0A*Total a pagar:* $${total.toFixed(2)}%0A%0A`;
-            texto += `Por favor confírmenme mi orden. ¡Gracias!`;
-
-            // Guardar en Firebase
-            if (typeof window.guardarPedidoFirebase === 'function') {
-                const pedido = {
-                    nombre,
-                    telefono,
-                    entrega: tipoEntrega,
-                    direccion: tipoEntrega === 'domicilio' ? direccion : '',
-                    restaurante: NOMBRE_NEGOCIO,
-                    items: carrito.map(i => ({ id: i.id, nombre: i.nombre, cantidad: i.cantidad, precio: i.precio })),
-                    subtotal,
-                    envio,
-                    total
-                };
-                const firebaseId = await window.guardarPedidoFirebase(pedido);
-                if (firebaseId) {
-                    agregarPedidoAlHistorial(firebaseId, pedido);
-                }
-            }
-
-            const url = `https://wa.me/${numeroWhatsApp}?text=${texto}`;
-            window.open(url, '_blank');
-            registrarEnvio(); // anti-spam: cuenta este pedido
-
-            cerrarConfirmacion();
-
-            // Vacía el carrito: ya quedó registrado en Firebase y en el historial,
-            // así se evita que el cliente lo reenvíe sin querer.
-            carrito = [];
-            guardarEstado();
-            actualizarInterfazCarrito();
-            cerrarCarrito();
-
-            } finally {
-                enviandoPedido = false;
-                btn.classList.remove('disabled');
-                btnTexto.textContent = 'Enviar pedido por WhatsApp';
-                btnConfirm.classList.remove('disabled');
-                btnConfirmTexto.textContent = 'Sí, enviar pedido';
-            }
-        }
-
-        // 7. INICIALIZAR CUANDO CARGUE LA PÁGINA
-        function actualizarBannerHorario() {
-            const horario = estadoHorario();
-            const banner = document.getElementById('horario-banner');
-            const icono = document.getElementById('horario-banner-icono');
-            const texto = document.getElementById('horario-banner-texto');
-
-            banner.style.display = 'flex';
-            banner.classList.toggle('abierto', horario.abierto);
-            banner.classList.toggle('cerrado', !horario.abierto);
-            icono.textContent = horario.abierto ? '🟢' : '🔴';
-            texto.textContent = horario.mensaje;
-        }
-
-        // Helper: cierra el carrito y desbloquea el scroll del body
-        function cerrarCarrito() {
-            document.getElementById('cart-toggle').checked = false;
-            document.body.classList.remove('modal-open');
-        }
-
-        window.onload = () => {
-            inicializarCategoriasDinamicas();
-            renderizarMenu();
-            actualizarBannerHorario();
-            setInterval(actualizarBannerHorario, 60000); // revisa el horario cada minuto
-
-            // Asegura que el modal del carrito SIEMPRE arranque cerrado
-            // (algunos navegadores restauran el checkbox marcado al recargar la página)
-            document.getElementById('cart-toggle').checked = false;
-
-            // Restaurar nombre, teléfono y dirección guardados
-            document.getElementById('cliente-nombre').value = localStorage.getItem('cafe_nombre') || '';
-            document.getElementById('cliente-telefono').value = localStorage.getItem('cafe_telefono') || '';
-            document.getElementById('direccion-campo').value = localStorage.getItem('cafe_direccion') || '';
-
-            // Restaurar tipo de entrega elegido previamente
-            if (tipoEntrega) {
-                seleccionarEntrega(tipoEntrega);
-            }
-
-            // Guardar nombre/dirección automáticamente mientras el usuario escribe
-            document.getElementById('cliente-nombre').addEventListener('input', guardarEstado);
-            document.getElementById('direccion-campo').addEventListener('input', guardarEstado);
-
-            // Bloquear scroll del body cuando el modal del carrito está abierto
-            // (previene el scroll "atrapado" al cambiar entre domicilio/recoger en iOS y Android)
-            document.getElementById('cart-toggle').addEventListener('change', function() {
-                if (this.checked) {
-                    document.body.classList.add('modal-open');
-                } else {
-                    document.body.classList.remove('modal-open');
-                }
-            });
-
-            actualizarInterfazCarrito();
-
-            // Pintar historial guardado y reconectar el seguimiento en vivo de pedidos activos
-            renderHistorial();
-            resuscribirPedidosActivos();
-        };
-        // ── SPLASH SCREEN ──
-    // Espera a que las fuentes carguen y luego oculta el splash a los 2.5s
-    (function() {
-        const splash = document.getElementById('splash');
-        const MIN_SPLASH = 2500; // milisegundos mínimos que se muestra
-        const start = Date.now();
-
-        // Fuerza el alto real del splash con el viewport medido por JS.
-        // Algunos navegadores móviles (sobre todo webviews como el de WhatsApp)
-        // calculan mal "inset:0" / "100vh" y dejan un hueco abajo donde ya se
-        // asoma la página. Usamos visualViewport (o innerHeight) y lo
-        // recalculamos en cada resize/orientationchange para que nunca falle.
-        function ajustarAltoSplash() {
-            const alto = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-            splash.style.height = alto + 'px';
-        }
-        ajustarAltoSplash();
-        window.addEventListener('resize', ajustarAltoSplash);
-        window.addEventListener('orientationchange', ajustarAltoSplash);
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', ajustarAltoSplash);
-        }
-
-        function ocultarSplash() {
-            const transcurrido = Date.now() - start;
-            const restante = Math.max(0, MIN_SPLASH - transcurrido);
-            setTimeout(() => {
-                splash.classList.add('oculto');
-                // Ya no se necesita seguir escuchando una vez oculto
-                window.removeEventListener('resize', ajustarAltoSplash);
-                window.removeEventListener('orientationchange', ajustarAltoSplash);
-                if (window.visualViewport) {
-                    window.visualViewport.removeEventListener('resize', ajustarAltoSplash);
-                }
-            }, restante);
-        }
-
-        if (document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(ocultarSplash);
-        } else {
-            ocultarSplash();
-        }
-    })();
-
+// Guardar pedido en Firestore
+window._guardarFirebase = async function(pedido) {
+    try {
+        const ref = await addDoc(collection(db, 'pedidos'), { ...pedido, timestamp: serverTimestamp(), estado: 'pendiente' });
+        return ref.id;
+    } catch(e) { console.error('Firebase error:', e); return null; }
+};
+
+// Suscribir seguimiento en tiempo real de pedidos del historial
+const historialGuardado = JSON.parse(localStorage.getItem('ne_historial') || '[]');
+historialGuardado.forEach(p => {
+    if (!p.id || p.estado === 'entregado' || p.estado === 'cancelado') return;
+    const unsub = onSnapshot(doc(db, 'pedidos', p.id), snap => {
+        if (!snap.exists()) return;
+        const data2 = snap.data();
+        const nuevoEstado = data2.estado;
+        const tiempoMin2 = data2.tiempoEstimadoMin || null;
+        const idx = historial.findIndex(h => h.id === p.id);
+        if (idx < 0) return;
+        if (tiempoMin2) historial[idx].tiempoEstimadoMin = tiempoMin2;
+        const prev = historial[idx].estado;
+        if (prev === nuevoEstado) return;
+        historial[idx].estado = nuevoEstado;
+        localStorage.setItem('ne_historial', JSON.stringify(historial.slice(0,30)));
+        renderHistorial();
+        actualizarBadges();
+        notificarCambioEstado(nuevoEstado, historial[idx]?.nombre, tiempoMin2);
+        if (nuevoEstado === 'entregado' || nuevoEstado === 'cancelado') unsub();
+    });
+});
 </script>
+
+<!-- Modal confirm personalizado -->
+<div class="cc-overlay" id="cc-overlay">
+    <div class="cc-box">
+        <div class="cc-icon" id="cc-icon">⚠️</div>
+        <div class="cc-title" id="cc-title">¿Estás seguro?</div>
+        <div class="cc-msg" id="cc-msg"></div>
+        <div class="cc-btns">
+            <button class="cc-cancel" id="cc-cancel">Cancelar</button>
+            <button class="cc-ok" id="cc-ok">Aceptar</button>
+        </div>
+    </div>
+</div>
 </body>
 </html>
